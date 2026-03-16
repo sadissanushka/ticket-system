@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Role Enum
+enum Role {
+  STUDENT
+  ADMIN
+  TECHNICIAN
+}
+
+// Ticket Status Enum
+enum Status {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  WAITING
+  RESOLVED
+  CLOSED
+}
+
+// Priority
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  name             String
+  password         String    // We'll store hashed password
+  role             Role      @default(STUDENT)
+  department       String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Relationships
+  ticketsCreated   Ticket[]  @relation("TicketAuthor")
+  ticketsAssigned  Ticket[]  @relation("TicketAssignee")
+  messagesSent     Message[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  tickets     Ticket[]
+}
+
+model Ticket {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  status      Status    @default(OPEN)
+  priority    Priority  @default(LOW)
+  location    String?
+  device      String?
+  
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Foreign Keys
+  authorId    String
+  author      User      @relation("TicketAuthor", fields: [authorId], references: [id])
+  
+  assignedToId String?
+  assignedTo   User?    @relation("TicketAssignee", fields: [assignedToId], references: [id])
+  
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+
+  // Relationships
+  messages    Message[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  text      String
+  createdAt DateTime @default(now())
+  isSystem  Boolean  @default(false)
+
+  // Foreign Keys
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  senderId  String?
+  sender    User?    @relation(fields: [senderId], references: [id])
+}

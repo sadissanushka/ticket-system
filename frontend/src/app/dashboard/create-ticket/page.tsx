@@ -1,0 +1,256 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, UploadCloud, Info, CheckCircle2, Loader2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/context/AuthContext";
+
+type Category = { id: string; name: string };
+
+export default function CreateTicketPage() {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  // Form state
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [priority, setPriority] = useState("LOW");
+  const [location, setLocation] = useState("");
+  const [device, setDevice] = useState("");
+
+  // UI state
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  // Load categories from DB on mount
+  useEffect(() => {
+    fetch("http://localhost:5000/api/categories")
+      .then((res) => res.json())
+      .then(setCategories)
+      .catch(() => setError("Could not load categories. Is the backend running?"));
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!user) {
+      setError("You must be logged in to create a ticket.");
+      return;
+    }
+
+    if (!categoryId) {
+      setError("Please select a category.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          description,
+          categoryId,
+          priority,
+          location: location || undefined,
+          device: device || undefined,
+          authorId: user.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to create ticket");
+      }
+
+      // Show success state briefly, then redirect
+      setIsSuccess(true);
+      setTimeout(() => router.push("/dashboard"), 2000);
+
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isSuccess) {
+    return (
+      <div className="max-w-3xl mx-auto flex flex-col items-center justify-center text-center py-24 space-y-4">
+        <div className="bg-green-100 p-5 rounded-full">
+          <CheckCircle2 className="h-12 w-12 text-green-600" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900">Ticket Submitted!</h2>
+        <p className="text-gray-500 max-w-sm">Your ticket has been saved to the database and assigned a tracking ID. Redirecting to your dashboard...</p>
+        <Loader2 className="h-5 w-5 animate-spin text-primary mt-2" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div className="flex items-center gap-4">
+        <Link href="/dashboard">
+          <Button variant="outline" size="icon" className="h-8 w-8 rounded-full border-gray-200">
+            <ArrowLeft className="h-4 w-4 text-gray-600" />
+          </Button>
+        </Link>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Create New Ticket</h1>
+          <p className="text-sm text-gray-500">Submit a technical issue to the IT Help Desk.</p>
+        </div>
+      </div>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <Card className="shadow-md border-gray-100/50">
+          <CardHeader className="bg-gray-50/50 border-b pb-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-xl text-gray-900">Issue Details</CardTitle>
+                <CardDescription className="mt-1">
+                  Please provide as much information as possible to help us resolve your issue quickly.
+                </CardDescription>
+              </div>
+              <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 flex gap-1 items-center px-3 py-1">
+                <Info className="h-3.5 w-3.5" />
+                Est. response: 2 hrs
+              </Badge>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-6 pt-6">
+            {/* Row 1: Title & Category */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="title" className="font-semibold text-gray-700">Issue Title <span className="text-red-500">*</span></Label>
+                <Input
+                  id="title"
+                  placeholder="e.g., WiFi disconnected in library"
+                  required
+                  className="h-11 bg-gray-50/50 border-gray-200 focus-visible:ring-primary/20"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category" className="font-semibold text-gray-700">Category <span className="text-red-500">*</span></Label>
+                <Select onValueChange={setCategoryId} value={categoryId}>
+                  <SelectTrigger className="h-11 bg-gray-50/50 border-gray-200">
+                    <SelectValue placeholder={categories.length === 0 ? "Loading categories..." : "Select a category"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Row 2: Location & Priority */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="location" className="font-semibold text-gray-700">Location (Optional)</Label>
+                <Input
+                  id="location"
+                  placeholder="e.g., Lab 2, Building A"
+                  className="h-11 bg-gray-50/50 border-gray-200 focus-visible:ring-primary/20"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="priority" className="font-semibold text-gray-700">Priority Level <span className="text-red-500">*</span></Label>
+                <Select value={priority} onValueChange={setPriority}>
+                  <SelectTrigger className="h-11 bg-gray-50/50 border-gray-200">
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="LOW">Low (Not urgent)</SelectItem>
+                    <SelectItem value="MEDIUM">Medium (Impacting work)</SelectItem>
+                    <SelectItem value="HIGH">High (Critical failure)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="device" className="font-semibold text-gray-700">Device Type (Optional)</Label>
+              <Input
+                id="device"
+                placeholder="e.g., MacBook Pro, Lab PC #12"
+                className="h-11 bg-gray-50/50 border-gray-200 focus-visible:ring-primary/20"
+                value={device}
+                onChange={(e) => setDevice(e.target.value)}
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description" className="font-semibold text-gray-700">Detailed Description <span className="text-red-500">*</span></Label>
+              <Textarea
+                id="description"
+                placeholder="Please describe exactly what happened, including any error messages you saw..."
+                className="min-h-[120px] bg-gray-50/50 border-gray-200 focus-visible:ring-primary/20 resize-y"
+                required
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+
+            {/* File Upload (UI only — backend file upload is out of scope) */}
+            <div className="space-y-2 pt-2">
+              <Label className="font-semibold text-gray-700">Attachments (Optional)</Label>
+              <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-gray-50 transition-colors cursor-pointer group">
+                <div className="bg-primary/5 p-3 rounded-full mb-3 group-hover:bg-primary/10 transition-colors">
+                  <UploadCloud className="h-6 w-6 text-primary" />
+                </div>
+                <p className="text-sm font-medium text-gray-700">Click to upload or drag and drop</p>
+                <p className="text-xs text-gray-500 mt-1">PNG, JPG, PDF up to 10MB</p>
+              </div>
+            </div>
+
+          </CardContent>
+
+          <CardFooter className="bg-gray-50/50 border-t p-6 flex justify-end gap-3 rounded-b-xl">
+            <Link href="/dashboard">
+              <Button type="button" variant="outline" className="h-11 px-6 font-medium" disabled={isSubmitting}>
+                Cancel
+              </Button>
+            </Link>
+            <Button type="submit" className="h-11 px-8 shadow-md" disabled={isSubmitting || categories.length === 0}>
+              {isSubmitting ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
+              ) : "Submit Ticket"}
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
+    </div>
+  );
+}
