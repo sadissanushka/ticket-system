@@ -52,11 +52,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen bg-background text-foreground flex flex-col justify-center items-center p-4">
       {/* Back to home */}
       <div className="absolute top-6 left-6">
         <Link href="/">
-          <Button variant="ghost" className="text-gray-500 hover:text-gray-900">
+          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Button>
@@ -69,12 +69,12 @@ export default function LoginPage() {
           <div className="bg-primary p-3 rounded-2xl shadow-lg mb-6">
             <MonitorCheck className="h-10 w-10 text-primary-foreground" />
           </div>
-          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Stitch University</h2>
-          <p className="mt-2 text-sm text-gray-600">IT Help Desk Ticketing System</p>
+          <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Stitch University</h2>
+          <p className="mt-2 text-sm text-muted-foreground">IT Help Desk Ticketing System</p>
         </div>
 
         {/* Login Card */}
-        <Card className="shadow-xl border-gray-100">
+        <Card className="shadow-xl border-border">
           <CardHeader className="space-y-1 pb-6">
             <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
             <CardDescription className="text-center">
@@ -83,17 +83,17 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {/* SSO Option */}
-            <Button variant="outline" className="w-full h-12 text-base font-medium border-gray-200 bg-gray-50 hover:bg-gray-100 hover:text-gray-900 transition-colors">
-              <Building className="mr-2 h-5 w-5 text-gray-600" />
+            <Button variant="outline" className="w-full h-12 text-base font-medium border-border bg-muted/40 hover:bg-muted/70 hover:text-foreground transition-colors">
+              <Building className="mr-2 h-5 w-5 text-muted-foreground" />
               Continue with University SSO
             </Button>
             
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-200" />
+                <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
               </div>
             </div>
 
@@ -101,7 +101,7 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <Label htmlFor="email">Email or Student ID</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                   <Input 
                     id="email" 
                     type="text" 
@@ -121,7 +121,7 @@ export default function LoginPage() {
                   </Link>
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                   <Input 
                     id="password" 
                     type="password" 
@@ -137,8 +137,8 @@ export default function LoginPage() {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col border-t p-6 bg-gray-50/50 rounded-b-lg">
-            <p className="text-xs text-center text-gray-500">
+          <CardFooter className="flex flex-col border-t p-6 bg-muted/30 rounded-b-lg">
+            <p className="text-xs text-center text-muted-foreground">
               Your role (Student, Technician, Admin) will be automatically detected upon login.
             </p>
           </CardFooter>

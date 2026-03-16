@@ -26,12 +26,12 @@ type Ticket = {
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
-    case "OPEN":        return <Badge className="bg-blue-100 text-blue-700 border-blue-200">Open</Badge>;
-    case "ASSIGNED":    return <Badge className="bg-purple-100 text-purple-700 border-purple-200">Assigned</Badge>;
-    case "IN_PROGRESS": return <Badge className="bg-orange-100 text-orange-700 border-orange-200">In Progress</Badge>;
-    case "WAITING":     return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">Waiting</Badge>;
-    case "RESOLVED":    return <Badge className="bg-green-100 text-green-700 border-green-200">Resolved</Badge>;
-    case "CLOSED":      return <Badge className="bg-gray-100 text-gray-700 border-gray-200">Closed</Badge>;
+    case "OPEN":        return <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">Open</Badge>;
+    case "ASSIGNED":    return <Badge className="bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">Assigned</Badge>;
+    case "IN_PROGRESS": return <Badge className="bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800">In Progress</Badge>;
+    case "WAITING":     return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800">Waiting</Badge>;
+    case "RESOLVED":    return <Badge className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800">Resolved</Badge>;
+    case "CLOSED":      return <Badge className="bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700">Closed</Badge>;
     default:            return <Badge variant="outline">{status}</Badge>;
   }
 }
@@ -47,7 +47,7 @@ function TicketTable({
 
   return (
     <Table>
-      <TableHeader className="bg-gray-50/50">
+      <TableHeader className="bg-muted/40">
         <TableRow>
           <TableHead className="w-[110px] font-semibold">Ticket ID</TableHead>
           <TableHead className="font-semibold">Title</TableHead>
@@ -60,12 +60,12 @@ function TicketTable({
         {isLoading ? (
           <TableRow>
             <TableCell colSpan={5} className="h-24 text-center">
-              <Loader2 className="mx-auto h-6 w-6 animate-spin text-gray-400" />
+              <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
             </TableCell>
           </TableRow>
         ) : tickets.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={5} className="h-24 text-center text-gray-500">
+            <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
               No tickets in this category.
             </TableCell>
           </TableRow>
@@ -79,16 +79,16 @@ function TicketTable({
               <TableCell className="font-mono font-medium text-primary text-xs">
                 {ticket.id.slice(0, 8)}
               </TableCell>
-              <TableCell className="font-medium text-gray-900 group-hover:text-primary transition-colors">
+              <TableCell className="font-medium text-foreground group-hover:text-primary transition-colors">
                 {ticket.title}
               </TableCell>
-              <TableCell className="text-gray-500">
+              <TableCell className="text-muted-foreground">
                 {ticket.category?.name || "N/A"}
               </TableCell>
               <TableCell>
                 <StatusBadge status={ticket.status} />
               </TableCell>
-              <TableCell className="text-right text-sm text-gray-500">
+              <TableCell className="text-right text-sm text-muted-foreground">
                 {new Date(ticket.createdAt).toLocaleDateString()}
               </TableCell>
             </TableRow>
@@ -142,8 +142,8 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">My Tickets</h1>
-          <p className="text-gray-500 mt-1">Manage and track your IT support requests.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">My Tickets</h1>
+          <p className="text-muted-foreground mt-1">Manage and track your IT support requests.</p>
         </div>
         <Link href="/dashboard/create-ticket">
           <Button className="shadow-sm">
@@ -153,14 +153,14 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-card rounded-xl shadow-sm border border-border p-6">
         <Tabs defaultValue="all" className="w-full">
           {/* Tab Bar + Search */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <TabsList className="bg-gray-100/80">
+            <TabsList className="bg-muted">
               <TabsTrigger value="all">
                 All
-                <span className="ml-1.5 text-[11px] font-bold bg-gray-200 text-gray-600 rounded-full px-1.5">{tickets.length}</span>
+                <span className="ml-1.5 text-[11px] font-bold bg-muted text-muted-foreground rounded-full px-1.5">{tickets.length}</span>
               </TabsTrigger>
               <TabsTrigger value="open">
                 Open
@@ -177,11 +177,11 @@ export default function DashboardPage() {
             </TabsList>
 
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search tickets..."
-                className="pl-9 bg-gray-50 border-gray-200 focus-visible:ring-primary/20"
+                className="pl-9 bg-muted/40 border-border focus-visible:ring-primary/20"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

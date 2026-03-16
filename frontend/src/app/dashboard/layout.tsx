@@ -27,26 +27,26 @@ export default function DashboardLayout({
     : "??";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-background flex flex-col font-sans text-foreground">
       {/* Top bar */}
-      <header className="px-6 lg:px-12 h-16 flex items-center justify-between border-b bg-white sticky top-0 z-40">
+      <header className="px-6 lg:px-12 h-16 flex items-center justify-between border-b border-border bg-card/95 backdrop-blur sticky top-0 z-40">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="bg-primary p-1.5 rounded-md">
             <MonitorCheck className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-lg text-gray-900 tracking-tight hidden sm:inline-block">
+          <span className="font-bold text-lg text-foreground tracking-tight hidden sm:inline-block">
             StitchU Dashboard
           </span>
         </Link>
         
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-900">
+          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
             <Bell className="h-5 w-5" />
           </Button>
           
           <DropdownMenu>
             <DropdownMenuTrigger className="rounded-full outline-none">
-              <span className="relative flex h-8 w-8 items-center justify-center rounded-full hover:bg-black/5 transition-colors cursor-pointer">
+              <span className="relative flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                     {initials}

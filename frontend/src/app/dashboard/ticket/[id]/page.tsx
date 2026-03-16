@@ -319,14 +319,12 @@ export default function TicketDetailsPage() {
     const dark = stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
     setIsDark(dark);
     document.documentElement.classList.toggle("dark", dark);
-    document.body.style.backgroundColor = dark ? "#0a0f1e" : "";
     document.body.style.colorScheme = dark ? "dark" : "light";
   }, []);
 
   const applyTheme = (dark: boolean) => {
     document.documentElement.classList.toggle("dark", dark);
-    // Force background on body so parent layouts respond immediately
-    document.body.style.backgroundColor = dark ? "#0a0f1e" : "";
+    // Keep native form controls aligned with selected theme
     document.body.style.colorScheme = dark ? "dark" : "light";
   };
 
@@ -500,7 +498,7 @@ export default function TicketDetailsPage() {
   const priorityConf = PRIORITY_CONFIG[ticket.priority] ?? PRIORITY_CONFIG.MEDIUM;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-5 px-1">
+    <div className="max-w-6xl mx-auto space-y-5 px-1 text-foreground">
 
       {/* ── Top Bar ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
