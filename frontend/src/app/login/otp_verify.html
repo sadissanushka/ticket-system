@@ -1,0 +1,238 @@
+<!-- Page Description: Verifies the 6-digit OTP sent to the user's email. On successful verification, redirects the user to the password reset page. -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .otp-input {
+            width: 48px;
+            height: 48px;
+            text-align: center;
+            font-size: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md text-center">
+
+        <h2 class="text-2xl font-bold mb-2">Verify OTP</h2>
+        <p id="infoText" class="text-gray-500 mb-6"></p>
+
+        <!-- OTP Inputs -->
+        <div class="flex justify-center gap-2 mb-6">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="otp-input focus:outline-none focus:ring-2 focus:ring-blue-600 transition-shadow">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="otp-input focus:outline-none focus:ring-2 focus:ring-blue-600 transition-shadow">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="otp-input focus:outline-none focus:ring-2 focus:ring-blue-600 transition-shadow">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="otp-input focus:outline-none focus:ring-2 focus:ring-blue-600 transition-shadow">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="otp-input focus:outline-none focus:ring-2 focus:ring-blue-600 transition-shadow">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="otp-input focus:outline-none focus:ring-2 focus:ring-blue-600 transition-shadow">
+        </div>
+
+        <!-- Error -->
+        <p id="errorMsg" class="text-red-500 text-sm mb-3 hidden"></p>
+
+        <!-- Verify Button -->
+        <button id="verifyBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+            Verify OTP
+        </button>
+
+        <!-- Resend -->
+        <div class="mt-4 text-sm text-gray-600">
+            Didn't receive code?
+            <button id="resendBtn" class="text-blue-600 font-semibold ml-1">
+                Resend
+            </button>
+            <span id="timer" class="ml-2"></span>
+        </div>
+
+    </div>
+
+    <script>
+        /* ================= CONFIG ================= */
+        // 🔧 CHANGE THESE WHEN BACKEND IS READY
+        const CONFIG = {
+            VERIFY_OTP_API: "/api/auth/verify-otp",
+            RESEND_OTP_API: "/api/auth/resend-otp",
+            REDIRECT_AFTER_SUCCESS: "change_pass.html"
+        };
+
+        /* ================= STATE ================= */
+        const inputs = document.querySelectorAll(".otp-input");
+        const verifyBtn = document.getElementById("verifyBtn");
+        const resendBtn = document.getElementById("resendBtn");
+        const errorMsg = document.getElementById("errorMsg");
+        const infoText = document.getElementById("infoText");
+
+        let timeLeft = 30;
+
+        // 📌 Get email from previous page
+        const email = localStorage.getItem("resetEmail");
+
+        if (!email) {
+            // fallback if user directly opens page
+            infoText.innerText = "Session expired. Please restart password reset.";
+            verifyBtn.disabled = true;
+        } else {
+            infoText.innerText = `Enter OTP sent to ${email}`;
+        }
+
+        /* ================= INPUT LOGIC ================= */
+        inputs.forEach((input, index) => {
+            input.addEventListener("input", (e) => {
+                // Ensure numeric only
+                input.value = input.value.replace(/[^0-9]/g, '');
+
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+
+                // Auto-submit if all filled via typing/autocomplete
+                if (getOTP().length === inputs.length) {
+                    verifyBtn.click();
+                }
+            });
+
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && !input.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+
+            // Handle Paste Event
+            input.addEventListener("paste", (e) => {
+                e.preventDefault();
+                const pastedData = (e.clipboardData || window.clipboardData).getData('text').trim();
+                
+                // Filter only numbers
+                const numericData = pastedData.replace(/[^0-9]/g, '');
+                if (!numericData) return;
+
+                const otpChars = numericData.split('').slice(0, inputs.length);
+                
+                otpChars.forEach((char, i) => {
+                    inputs[i].value = char;
+                });
+                
+                // Focus on the next empty input or the last one
+                if (otpChars.length < inputs.length) {
+                    inputs[otpChars.length].focus();
+                } else {
+                    inputs[inputs.length - 1].focus();
+                    verifyBtn.click(); // Auto-submit when fully pasted
+                }
+            });
+        });
+
+        /* ================= HELPER ================= */
+        function getOTP() {
+            return Array.from(inputs).map(i => i.value).join("");
+        }
+
+        function showError(msg) {
+            errorMsg.innerText = msg;
+            errorMsg.classList.remove("hidden");
+        }
+
+        function clearError() {
+            errorMsg.classList.add("hidden");
+        }
+
+        /* ================= VERIFY OTP ================= */
+        verifyBtn.addEventListener("click", async () => {
+            clearError();
+
+            const otp = getOTP();
+
+            if (otp.length !== 6) {
+                return showError("Enter complete OTP");
+            }
+
+            verifyBtn.disabled = true;
+            verifyBtn.innerText = "Verifying...";
+
+            try {
+                const res = await fetch(CONFIG.VERIFY_OTP_API, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        otp: otp
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || "Verification failed");
+                }
+
+                // ✅ SUCCESS
+                localStorage.setItem("otpVerified", "true");
+
+                window.location.href = CONFIG.REDIRECT_AFTER_SUCCESS;
+
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.innerText = "Verify OTP";
+            }
+        });
+
+        /* ================= RESEND OTP ================= */
+        resendBtn.addEventListener("click", async () => {
+            resendBtn.disabled = true;
+
+            try {
+                await fetch(CONFIG.RESEND_OTP_API, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                startTimer();
+
+            } catch {
+                showError("Failed to resend OTP");
+                resendBtn.disabled = false;
+            }
+        });
+
+        /* ================= TIMER ================= */
+        function startTimer() {
+            let timer = document.getElementById("timer");
+            timeLeft = 30;
+
+            const countdown = setInterval(() => {
+                timer.textContent = `(${timeLeft}s)`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    resendBtn.disabled = false;
+                    timer.textContent = "";
+                }
+
+                timeLeft--;
+            }, 1000);
+        }
+
+        startTimer();
+    </script>
+
+</body>
+
+</html>
