@@ -162,8 +162,8 @@ export default function CreateTicketPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/dashboard">
-          <Button variant="outline" size="icon" className="h-8 w-8 rounded-full border-border">
-            <ArrowLeft className="h-4 w-4 text-muted-foreground" />
+          <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl border-slate-200 dark:border-slate-500 shrink-0 cursor-pointer">
+            <ArrowLeft className="h-4 w-4 text-slate-200" />
           </Button>
         </Link>
         <div>
@@ -188,7 +188,7 @@ export default function CreateTicketPage() {
                   Please provide as much information as possible to help us resolve your issue quickly.
                 </CardDescription>
               </div>
-              <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 flex gap-1 items-center px-3 py-1">
+              <Badge variant="secondary" className="bg-blue-50 text-primary hover:bg-blue-100 flex gap-1 items-center px-3 py-1">
                 <Info className="h-3.5 w-3.5" />
                 Est. response: 2 hrs
               </Badge>
@@ -202,7 +202,7 @@ export default function CreateTicketPage() {
                 <Label htmlFor="title" className="font-semibold text-foreground/90">Issue Title <span className="text-red-500">*</span></Label>
                 <Input
                   id="title"
-                  placeholder="e.g., WiFi disconnected in library"
+                  placeholder="e.g.: WiFi disconnected in library"
                   required
                   className="h-11 bg-muted/40 border-border focus-visible:ring-primary/20"
                   value={title}
@@ -233,7 +233,7 @@ export default function CreateTicketPage() {
                 <Label htmlFor="location" className="font-semibold text-foreground/90">Location (Optional)</Label>
                 <Input
                   id="location"
-                  placeholder="e.g., Lab 2, Building A"
+                  placeholder="e.g.: Lab 2, Building A"
                   className="h-11 bg-muted/40 border-border focus-visible:ring-primary/20"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
@@ -259,7 +259,7 @@ export default function CreateTicketPage() {
               <Label htmlFor="device" className="font-semibold text-foreground/90">Device Type (Optional)</Label>
               <Input
                 id="device"
-                placeholder="e.g., MacBook Pro, Lab PC #12"
+                placeholder="e.g.: MacBook Pro, Lab PC #12"
                 className="h-11 bg-muted/40 border-border focus-visible:ring-primary/20"
                 value={device}
                 onChange={(e) => setDevice(e.target.value)}

@@ -51,7 +51,8 @@
   --color-status-resolved: #22C55E;
   --color-status-closed: #6B7280;
   
-  --color-primary: #2563EB;
+  /*--color-primary: #2563EB;*/
+  --color-primary: #1452DA;
   --color-primary-foreground: #FFFFFF;
 }
 
@@ -134,4 +135,8 @@
   html {
     @apply font-sans;
   }
+}
+
+html{
+  scroll-behavior: smooth;
 }
