@@ -1,6 +1,10 @@
 # Deployment Guide 🚀 (Ultra-Low Cost & Risk-Free)
 
+<<<<<<< HEAD
 This guide explains how to deploy the IT Help Desk Ticketing System for free, securely, and with zero cold-starts using **Neon**, **AWS EC2**, and **Cloudflare Pages**.
+=======
+This guide explains how to deploy the IT Help Desk Ticketing System for free using **Neon**, **AWS EC2**, and **Vercel**.
+>>>>>>> auth-fix
 
 ## 1. Database (PostgreSQL) - [Neon](https://neon.tech/)
 
@@ -24,6 +28,38 @@ We use a free tier AWS EC2 virtual machine so the backend runs 24/7 without slee
 6. **Key Pair:** Click "Create new key pair", name it `backend-key`, set it to `.pem` format, and download it safely to your computer.
 7. **Network Settings:** Check the boxes for **Allow HTTPS traffic from the internet** and **Allow HTTP traffic from the internet**. Click **Edit**, Add a Custom TCP rule for Port **5000** (Anywhere `0.0.0.0/0`).
 8. Click **Launch Instance**.
+<<<<<<< HEAD
+=======
+
+### Step 2.2: Setup the Server
+1. SSH into your server using your terminal:
+   `ssh -i "backend-key.pem" ubuntu@YOUR_EC2_PUBLIC_IP`
+2. Run these commands to install Node.js and PM2:
+   ```bash
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   sudo npm install -g pm2
+   sudo npm install -g typescript ts-node
+   ```
+3. Clone your GitHub repository and setup the backend:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/ticket-system.git
+   cd ticket-system/backend
+   npm install
+   npx prisma generate
+   npm run build
+   ```
+4. Create the `.env` file (`nano .env`) and add your database URL:
+   `DATABASE_URL="your-neon-postgres-url"`
+   `FRONTEND_URL="https://your-frontend-app.vercel.app"`
+   `PORT=5000`
+5. Start the backend continuously:
+   ```bash
+   pm2 start dist/src/index.js --name "helpdesk-backend"
+   pm2 save
+   pm2 startup
+   ```
+>>>>>>> auth-fix
 
 ### Step 2.2: Setup the Server
 1. SSH into your server using your terminal:
@@ -54,6 +90,7 @@ We use a free tier AWS EC2 virtual machine so the backend runs 24/7 without slee
 
 ## 3. Frontend (Next.js) - [Cloudflare Pages]
 
+<<<<<<< HEAD
 Cloudflare Pages provides a lightning-fast, 100% free edge network for your frontend.
 
 1. Go to your [Cloudflare Dashboard](https://dash.cloudflare.com/), navigate to **Workers & Pages**.
@@ -65,6 +102,17 @@ Cloudflare Pages provides a lightning-fast, 100% free edge network for your fron
    - Variable name: `NEXT_PUBLIC_API_URL`
    - Value: `http://YOUR_EC2_PUBLIC_IP:5000` (Use HTTPS here if you add an SSL certificate to your backend later).
 7. Click **Save and Deploy**. 
+=======
+1.  Create an account on [Vercel.com](https://vercel.com/).
+2.  Click **Add New** > **Project**.
+3.  Import your GitHub repository.
+4.  Configure the project:
+    - **Framework Preset**: `Next.js`
+    - **Root Directory**: `frontend`
+5.  Add **Environment Variables**:
+    - `NEXT_PUBLIC_API_URL`: `http://YOUR_EC2_PUBLIC_IP:5000` (Your EC2 backend URL)
+6.  Click **Deploy**.
+>>>>>>> auth-fix
 
 ---
 
@@ -72,6 +120,7 @@ Cloudflare Pages provides a lightning-fast, 100% free edge network for your fron
 
 The project includes continuous integration and deployment located in `.github/workflows/ci.yml`. 
 
+<<<<<<< HEAD
 **Automated Deployments:**
 - **Frontend**: Cloudflare automatically detects pushes to `main` and re-deploys instantly.
 - **Backend**: We use GitHub actions to SSH into your EC2 server to pull new changes automatically.
@@ -81,3 +130,14 @@ Go to your GitHub Repository -> **Settings** -> **Secrets and variables** -> **A
 1. `EC2_HOST`: The public IP address of your AWS EC2 instance.
 2. `EC2_USERNAME`: `ubuntu`
 3. `EC2_SSH_KEY`: The entire contents of your downloaded `.pem` file from AWS.
+=======
+- **Automated Builds**: Every time you push to `main` or create a Pull Request, GitHub will automatically check if both the frontend and backend build correctly.
+- **Continuous Deployment**: 
+    - **EC2 Backend**: You will need to pull changes manually on the server or use a GitHub Action for deployment.
+    - **Vercel** will automatically re-deploy your frontend when you push to `main`.
+
+## 📝 Important Notes
+
+- **Always-on**: Since your backend is hosted on an EC2 instance, it runs 24/7 and won't sleep, providing fast response times at all times.
+- **CORS**: Ensure the `FRONTEND_URL` in your backend `.env` matches your actual Vercel deployment URL exactly.
+>>>>>>> auth-fix
