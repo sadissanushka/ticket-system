@@ -140,16 +140,15 @@ export default function KanbanBoardPage() {
       {/* Header */}
       <div className="flex items-center gap-4 mb-6 shrink-0">
         <Link href="/dashboard/admin">
-          <Button variant="outline" size="icon" className="h-8 w-8 rounded-full border-gray-200">
-            <ArrowLeft className="h-4 w-4 text-gray-600" />
+          <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl border-slate-200 dark:border-slate-500 shrink-0 cursor-pointer">
+            <ArrowLeft className="h-4 w-4 text-slate-200" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">IT Help Desk Ticket Board</h1>
-          <p className="text-sm text-gray-500">Drag and drop tickets across columns to update their status automatically.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">IT Help Desk Ticket Board</h1>
+          <p className="text-sm text-muted-foreground">Drag and drop tickets to the relevant category to update their status automatically.</p>
         </div>
       </div>
-
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />

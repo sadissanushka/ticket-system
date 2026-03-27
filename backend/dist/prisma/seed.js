@@ -18,7 +18,7 @@ async function main() {
     // Note: Password usually should be hashed with bcrypt. Mocking for now.
     const studentUser = await prisma.user.create({
         data: {
-            email: 'student@stitchu.edu',
+            email: 'student@uni.edu',
             name: 'Sarah Smith',
             password: 'password123',
             role: 'STUDENT',
@@ -27,7 +27,7 @@ async function main() {
     });
     const techUser = await prisma.user.create({
         data: {
-            email: 'tech@stitchu.edu',
+            email: 'tech@uni.edu',
             name: 'Tom Technician',
             password: 'password123',
             role: 'TECHNICIAN',
@@ -36,7 +36,7 @@ async function main() {
     });
     const adminUser = await prisma.user.create({
         data: {
-            email: 'admin@stitchu.edu',
+            email: 'admin@uni.edu',
             name: 'Alice Admin',
             password: 'password123',
             role: 'ADMIN',

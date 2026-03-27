@@ -164,7 +164,7 @@ export default function TechnicianDashboardPage() {
               <TableHead className="font-semibold text-[10px] uppercase tracking-wider text-muted-foreground">Requester</TableHead>
               <TableHead className="font-semibold text-[10px] uppercase tracking-wider text-muted-foreground">Priority</TableHead>
               <TableHead className="font-semibold text-[10px] uppercase tracking-wider text-muted-foreground">Status</TableHead>
-              <TableHead className="text-right font-semibold text-[10px] uppercase tracking-wider text-muted-foreground">Quick Actions</TableHead>
+              <TableHead className="font-semibold text-[10px] uppercase tracking-wider text-muted-foreground">Quick Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

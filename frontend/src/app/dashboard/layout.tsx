@@ -42,7 +42,7 @@ export default function DashboardLayout({
             <MobileNav />
             <div className="md:hidden flex items-center gap-2">
                <span className="font-bold text-lg text-foreground tracking-tight">
-                StitchU
+                UniTech Assist
               </span>
             </div>
           </div>

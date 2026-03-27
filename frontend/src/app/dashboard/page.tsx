@@ -54,7 +54,7 @@ function TicketTable({
           <TableHead className="font-semibold">Title</TableHead>
           <TableHead className="font-semibold">Category</TableHead>
           <TableHead className="font-semibold">Status</TableHead>
-          <TableHead className="text-right font-semibold">Date</TableHead>
+          <TableHead className="font-semibold">Date</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

@@ -80,7 +80,7 @@ const MobileNav = () => {
               <MonitorCheck className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-lg text-foreground tracking-tight">
-              StitchU
+              UniTech Assist
             </span>
           </Link>
           <div className="flex items-center gap-1">

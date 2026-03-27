@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "StitchU IT Help Desk",
-  description: "IT Help Desk Ticketing System for Stitch University",
+  title: "UniTech Assist: IT Help Desk",
+  description: "University IT Help Desk: Ticket Manager - Streamline your IT support experience with our efficient ticket management system. Report, track, and resolve technical issues in real-time for students and staff.",
 };
 
 export default function RootLayout({

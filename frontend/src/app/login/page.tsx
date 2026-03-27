@@ -70,8 +70,8 @@ export default function LoginPage() {
           <div className="bg-primary p-3 rounded-2xl shadow-lg mb-6">
             <MonitorCheck className="h-10 w-10 text-primary-foreground" />
           </div>
-          <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Stitch University</h2>
-          <p className="mt-2 text-sm text-muted-foreground">IT Help Desk Ticketing System</p>
+          <h2 className="text-3xl font-extrabold text-foreground tracking-tight">UniTech Assist</h2>
+          <p className="mt-2 text-sm text-muted-foreground">University IT Help Desk: Ticket Manager</p>
         </div>
 
         {/* Login Card */}
@@ -106,7 +106,7 @@ export default function LoginPage() {
                   <Input 
                     id="email" 
                     type="text" 
-                    placeholder="student@stitchu.edu" 
+                    placeholder="student@uni.edu" 
                     className="pl-10 h-12"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

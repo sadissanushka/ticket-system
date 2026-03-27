@@ -399,9 +399,9 @@ export default function TicketDetailsPage() {
       {/* ── Top Bar ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex items-start gap-3 flex-1 min-w-[200px]">
-          <Link href="/dashboard" className="mt-1">
-            <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl border-slate-200 dark:border-slate-700 shrink-0">
-              <ArrowLeft className="h-4 w-4" />
+          <Link href="/dashboard/admin" className="mt-1">
+            <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl border-slate-200 dark:border-slate-500 shrink-0 cursor-pointer">
+              <ArrowLeft className="h-4 w-4 text-slate-200" />
             </Button>
           </Link>
           <div>
