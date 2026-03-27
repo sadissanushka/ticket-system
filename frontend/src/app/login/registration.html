@@ -1,0 +1,226 @@
+<!-- Page Description: Handles new user registration, validates credentials, and redirects to the dashboard upon successful account creation. -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>University IT Help Desk - Register</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563EB",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+
+<body
+    class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div
+        class="w-full max-w-md bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+
+        <!-- Header -->
+        <div class="flex flex-col items-center pt-8 pb-4 px-6 border-b border-slate-100 dark:border-slate-700">
+            <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white mb-4">
+                <span class="material-symbols-outlined text-3xl">school</span>
+            </div>
+            <h1 class="text-2xl font-bold text-center">University IT Help Desk</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Create your account</p>
+        </div>
+
+        <!-- Form -->
+        <div class="p-6">
+
+            <form id="registerForm" class="space-y-4">
+
+                <!-- Full Name -->
+                <div>
+                    <label class="text-sm font-medium">Full Name</label>
+                    <input id="name" name="name" type="text" class="w-full mt-1 p-2 border rounded-lg bg-transparent"
+                        placeholder="John Doe" required>
+                </div>
+
+                <!-- Student ID -->
+                <div>
+                    <label class="text-sm font-medium">Student ID</label>
+                    <input id="id" name="studentId" type="text" class="w-full mt-1 p-2 border rounded-lg bg-transparent"
+                        placeholder="123456A" required>
+                </div>
+
+                <!-- University Email -->
+                <div>
+                    <label class="text-sm font-medium">University Email</label>
+                    <input id="email" name="email" type="text" class="w-full mt-1 p-2 border rounded-lg bg-transparent"
+                        placeholder="jdoe.12@uom.lk" required>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="text-sm font-medium">Password</label>
+                    <div class="relative mt-1">
+                        <input id="password" name="password" type="password"
+                            class="w-full p-2 border rounded-lg bg-transparent pr-10" required>
+                        <button type="button"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                            onclick="togglePasswordVisibility('password', 'eyeIconPassword')">
+                            <span id="eyeIconPassword" class="material-symbols-outlined text-xl">visibility_off</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label class="text-sm font-medium">Confirm Password</label>
+                    <div class="relative mt-1">
+                        <input id="confirmPassword" name="confirmPassword" type="password"
+                            class="w-full p-2 border rounded-lg bg-transparent pr-10" required>
+                        <button type="button"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                            onclick="togglePasswordVisibility('confirmPassword', 'eyeIconConfirmPassword')">
+                            <span id="eyeIconConfirmPassword"
+                                class="material-symbols-outlined text-xl">visibility_off</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error -->
+                <p id="error" class="text-red-500 text-sm hidden"></p>
+
+                <!-- Register Button -->
+                <button type="submit"
+                    class="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700">
+                    Register
+                </button>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center p-4 border-t text-sm text-slate-500">
+            Already have an account? <a href="login.html" class="text-primary font-medium">Sign in</a>
+        </div>
+
+    </div>
+
+    <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.textContent = "visibility";
+            } else {
+                input.type = "password";
+                icon.textContent = "visibility_off";
+            }
+        }
+
+        document.getElementById("registerForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const studentId = document.getElementById("id").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const confirm = document.getElementById("confirmPassword").value;
+            const error = document.getElementById("error");
+            const submitBtn = this.querySelector('button[type="submit"]');
+
+            // Email validation
+            const emailRegex = /^[a-zA-Z]+\.\d{2}@uom\.lk$/;
+            if (!emailRegex.test(email)) {
+                error.textContent = "Email should include letters followed by '.' + 2 numbers + @uom.lk (e.g., jdoe.12@uom.lk)";
+                error.classList.remove("hidden");
+                return;
+            }
+
+            // Student ID validation
+            const studentIdRegex = /^\d{6}[A-Z]$/;
+            if (!studentIdRegex.test(studentId)) {
+                error.textContent = "Student ID should include 6 numbers followed by a capital letter (e.g., 123456A)";
+                error.classList.remove("hidden");
+                return;
+            }
+
+            if (password !== confirm) {
+                error.textContent = "Passwords do not match!";
+                error.classList.remove("hidden");
+                return;
+            }
+
+            error.classList.add("hidden");
+
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "Registering...";
+
+            try {
+                // Send form data to backend
+                const response = await fetch("/api/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        studentId: studentId,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                if (response.ok) {
+                    try {
+                        const data = await response.json();
+                        if (data && data.token) {
+                            localStorage.setItem('token', data.token);
+                        }
+                    } catch (e) {
+                        // ignore JSON parse error
+                    }
+                    alert("Registration successful!");
+                    window.location.href = "dashboard.html";
+                } else {
+                    let errorMessage = "Registration failed. Please try again.";
+                    try {
+                        const data = await response.json();
+                        if (data.message) errorMessage = data.message;
+                    } catch (e) {
+                        // ignore if not JSON
+                    }
+                    error.textContent = errorMessage;
+                    error.classList.remove("hidden");
+                }
+            } catch (err) {
+                error.textContent = "Network error. Please try again later.";
+                error.classList.remove("hidden");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = "Register";
+            }
+        });
+    </script>
+
+</body>
+
+</html>
