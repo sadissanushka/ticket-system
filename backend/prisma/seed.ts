@@ -24,6 +24,7 @@ async function main() {
       email: 'student@uni.edu',
       name: 'Sarah Smith',
       password: 'password123',
+      studentId: 'STU001',
       role: 'STUDENT',
       department: 'Computer Science',
     }
@@ -34,6 +35,7 @@ async function main() {
       email: 'tech@uni.edu',
       name: 'Tom Technician',
       password: 'password123',
+      studentId: 'TECH001',
       role: 'TECHNICIAN',
       department: 'IT Support',
     }
@@ -44,6 +46,7 @@ async function main() {
       email: 'admin@uni.edu',
       name: 'Alice Admin',
       password: 'password123',
+      studentId: 'ADMIN001',
       role: 'ADMIN',
       department: 'IT Management',
     }

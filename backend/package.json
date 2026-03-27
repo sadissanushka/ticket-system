@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node src/index.ts",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/src/index.js"
   },
@@ -29,6 +29,7 @@
     "@types/multer": "^2.1.0",
     "@types/node": "^25.5.0",
     "@types/socket.io": "^3.0.1",
+    "nodemon": "^3.1.14",
     "prisma": "^5.15.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

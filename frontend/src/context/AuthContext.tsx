@@ -17,6 +17,7 @@ type AuthContextType = {
   isLoading: boolean;
   login: (token: string, userData: User) => void;
   logout: () => void;
+  updateUser: (data: Partial<User>) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("helpdesk_user");
       }
     }
-    
+
     setIsLoading(false);
   }, []);
 
@@ -48,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("helpdesk_token", token);
     localStorage.setItem("helpdesk_user", JSON.stringify(userData));
     setUser(userData);
-    
+
     // Redirect based on role
     if (userData.role === "ADMIN") {
       router.push("/dashboard/admin");
@@ -66,8 +67,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login");
   };
 
+  const updateUser = (data: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...data };
+      setUser(updatedUser);
+      localStorage.setItem("helpdesk_user", JSON.stringify(updatedUser));
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
