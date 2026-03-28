@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PlusCircle, Search, LayoutDashboard, Ticket, CheckCircle2, Clock, Loader2, UserCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ function PriorityBadge({ priority }: { priority: string }) {
 
 // --- Main Page ---
 export default function AdminDashboardPage() {
+  const router = useRouter();
   const [tickets, setTickets] = useState<AdminTicket[]>([]);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,8 +85,8 @@ export default function AdminDashboardPage() {
     async function loadData() {
       try {
         const [ticketsRes, techsRes] = await Promise.all([
-          fetchWithAuth(`${API_URL}/api/tickets`),
-          fetchWithAuth(`${API_URL}/api/users/role/technician`),
+          fetchWithAuth(`${API_URL}/api/tickets/all`),
+          fetchWithAuth(`${API_URL}/api/users/staff`),
         ]);
         const [ticketsData, techsData] = await Promise.all([
           ticketsRes.json(), techsRes.json(),
@@ -276,8 +278,16 @@ export default function AdminDashboardPage() {
               </TableRow>
             ) : (
               filtered.map((ticket) => (
-                <TableRow key={ticket.id} className="hover:bg-primary/5 transition-colors border-border group">
-                  <TableCell className="font-mono font-medium text-primary text-xs">{ticket.id.slice(0, 8)}</TableCell>
+                <TableRow
+                  key={ticket.id}
+                  className="hover:bg-primary/5 cursor-pointer transition-colors border-border group"
+                  onClick={() => router.push(`/dashboard/ticket/${ticket.id}`)}
+                >
+                  <TableCell className="font-mono font-medium text-primary text-xs shrink-0">
+                    <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:underline">
+                      {ticket.id.slice(0, 8)}
+                    </Link>
+                  </TableCell>
                   <TableCell className="text-sm">
                     <div className="flex items-center gap-2">
                        <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shrink-0 border border-border">
@@ -288,7 +298,11 @@ export default function AdminDashboardPage() {
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium text-foreground text-sm max-w-[250px] truncate">{ticket.title}</TableCell>
+                  <TableCell className="font-medium text-foreground text-sm max-w-[250px] truncate">
+                    <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:text-primary transition-colors">
+                      {ticket.title}
+                    </Link>
+                  </TableCell>
                   <TableCell className="text-sm text-muted-foreground">{ticket.category?.name || "—"}</TableCell>
                   <TableCell><PriorityBadge priority={ticket.priority} /></TableCell>
                   <TableCell><StatusBadge status={ticket.status} /></TableCell>
@@ -305,7 +319,12 @@ export default function AdminDashboardPage() {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 text-xs text-primary font-medium">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 text-xs text-primary font-medium"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           Manage
                         </Button>
                       </DropdownMenuTrigger>

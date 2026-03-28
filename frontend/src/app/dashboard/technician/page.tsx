@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CheckCircle2, Search, PlayCircle, MessageSquare, Loader2, Clock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -63,6 +64,7 @@ function PriorityBadge({ priority }: { priority: string }) {
 }
 
 export default function TechnicianDashboardPage() {
+  const router = useRouter();
   const { user } = useAuth();
   const [tickets, setTickets] = useState<TechnicianTicket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -181,9 +183,21 @@ export default function TechnicianDashboardPage() {
                 </TableCell>
               </TableRow>
             ) : filteredTickets.map((ticket) => (
-              <TableRow key={ticket.id} className="hover:bg-primary/5 transition-colors group">
-                <TableCell className="font-mono font-medium text-primary text-sm">{ticket.id.slice(0, 8)}</TableCell>
-                <TableCell className="font-medium text-foreground text-sm max-w-[250px] truncate">{ticket.title}</TableCell>
+              <TableRow
+                key={ticket.id}
+                className="hover:bg-primary/5 cursor-pointer transition-colors group"
+                onClick={() => router.push(`/dashboard/ticket/${ticket.id}`)}
+              >
+                <TableCell className="font-mono font-medium text-primary text-sm">
+                  <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:underline">
+                    {ticket.id.slice(0, 8)}
+                  </Link>
+                </TableCell>
+                <TableCell className="font-medium text-foreground text-sm max-w-[250px] truncate">
+                  <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:text-primary transition-colors">
+                    {ticket.title}
+                  </Link>
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   <div className="flex flex-col">
                     <span className="text-foreground font-medium">{ticket.author.name}</span>
@@ -193,7 +207,7 @@ export default function TechnicianDashboardPage() {
                 <TableCell><PriorityBadge priority={ticket.priority} /></TableCell>
                 <TableCell><StatusBadge status={ticket.status} /></TableCell>
                 <TableCell className="text-right flex items-center justify-end gap-2 p-2">
-                  <Link href={`/dashboard/ticket/${ticket.id}`}>
+                  <Link href={`/dashboard/ticket/${ticket.id}`} onClick={(e) => e.stopPropagation()}>
                     <Button variant="ghost" size="sm" className="h-8 text-[11px] font-bold text-muted-foreground hover:text-primary">
                       <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
                       View Details
@@ -201,7 +215,12 @@ export default function TechnicianDashboardPage() {
                   </Link>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild className="outline-none">
-                      <Button size="sm" className="h-8 text-[11px] font-bold shadow-sm" disabled={updatingId === ticket.id}>
+                      <Button
+                        size="sm"
+                        className="h-8 text-[11px] font-bold shadow-sm"
+                        disabled={updatingId === ticket.id}
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {updatingId === ticket.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Update"}
                       </Button>
                     </DropdownMenuTrigger>

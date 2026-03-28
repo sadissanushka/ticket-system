@@ -24,6 +24,21 @@ router.get('/', authenticate, authorize(['ADMIN']), async (req: AuthRequest, res
   }
 });
 
+// Get all staff members (Admins + Technicians) for assignment
+router.get('/staff', authenticate, authorize(['ADMIN', 'TECHNICIAN']), async (req: AuthRequest, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        role: { in: ['ADMIN', 'TECHNICIAN'] }
+      },
+      select: { id: true, name: true, email: true, department: true, role: true }
+    });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch staff members' });
+  }
+});
+
 // Get users by specific Role (Admin/Technician only)
 router.get('/role/:role', authenticate, authorize(['ADMIN', 'TECHNICIAN']), async (req: AuthRequest, res: Response) => {
   try {

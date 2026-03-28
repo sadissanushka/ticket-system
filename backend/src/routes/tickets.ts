@@ -5,17 +5,13 @@ import { authenticate, authorize, AuthRequest } from '../middleware/authMiddlewa
 const router = Router();
 const prisma = new PrismaClient();
 
-// Get tickets (Filtered by role)
+// Get My Tickets (Always filtered by authorId)
 router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { role, id } = req.user!;
+    const { id } = req.user!;
     
-    // Students only see their own tickets
-    // Admins and Technicians see everything
-    const where = role === 'STUDENT' ? { authorId: id } : {};
-
     const tickets = await prisma.ticket.findMany({
-      where,
+      where: { authorId: id },
       include: {
         category: true,
         author: { select: { id: true, name: true, email: true } },
@@ -27,6 +23,24 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     res.json(tickets);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch tickets' });
+  }
+});
+
+// Get All Tickets (Admin/Technician overview)
+router.get('/all', authenticate, authorize(['ADMIN', 'TECHNICIAN']), async (req: AuthRequest, res: Response) => {
+  try {
+    const tickets = await prisma.ticket.findMany({
+      include: {
+        category: true,
+        author: { select: { id: true, name: true, email: true } },
+        assignedTo: { select: { id: true, name: true } },
+        attachments: true,
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(tickets);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch global tickets' });
   }
 });
 
