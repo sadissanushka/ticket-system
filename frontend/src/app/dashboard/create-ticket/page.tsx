@@ -41,7 +41,14 @@ export default function CreateTicketPage() {
   useEffect(() => {
     fetchWithAuth(`${API_URL}/api/categories`)
       .then((res) => res.json())
-      .then(setCategories)
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else {
+          console.error("Expected array for categories, got:", data);
+          setCategories([]);
+        }
+      })
       .catch(() => setError("Could not load categories. Is the backend running?"));
   }, []);
 

@@ -39,7 +39,12 @@ export function NotificationsDropdown() {
         const res = await fetchWithAuth(`${API_URL}/api/notifications`);
         if (res.ok) {
           const data = await res.json();
-          setNotifications(data);
+          if (Array.isArray(data)) {
+            setNotifications(data);
+          } else {
+            console.error("Expected array for notifications, got:", data);
+            setNotifications([]);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch notifications", err);

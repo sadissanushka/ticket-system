@@ -75,9 +75,16 @@ export default function TechnicianDashboardPage() {
       try {
         const res = await fetchWithAuth(`${API_URL}/api/tickets/assigned/${user.id}`);
         const data = await res.json();
-        setTickets(data);
+        
+        if (Array.isArray(data)) {
+          setTickets(data);
+        } else {
+          console.error("Expected array for technician tickets, got:", data);
+          setTickets([]);
+        }
       } catch (err) {
         console.error("Failed to fetch technician tickets", err);
+        setTickets([]);
       } finally {
         setIsLoading(false);
       }

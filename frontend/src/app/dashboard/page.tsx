@@ -111,9 +111,18 @@ export default function DashboardPage() {
       try {
         const response = await fetchWithAuth(`${API_URL}/api/tickets`);
         const data = await response.json();
-        setTickets(data);
+        
+        // Defensive check: if backend returns an object with error: "...", 
+        // don't try to filter it.
+        if (Array.isArray(data)) {
+          setTickets(data);
+        } else {
+          console.error("Expected array from API but got:", data);
+          setTickets([]);
+        }
       } catch (error) {
         console.error("Failed to fetch tickets", error);
+        setTickets([]);
       } finally {
         setIsLoading(false);
       }

@@ -63,23 +63,26 @@ export default function KanbanBoardPage() {
       try {
         const res = await fetchWithAuth(`${API_URL}/api/tickets`);
         const ticketsData = await res.json();
-
         const kanban = emptyKanban();
 
-        ticketsData.forEach((t: any) => {
-          kanban.tickets[t.id] = {
-            id: t.id,
-            title: t.title,
-            category: t.category?.name || "Uncategorized",
-            priority: t.priority,
-            assignedTo: t.assignedTo?.name || null,
-            timeAgo: new Date(t.createdAt).toLocaleDateString(),
-          };
+        if (Array.isArray(ticketsData)) {
+          ticketsData.forEach((t: any) => {
+            kanban.tickets[t.id] = {
+              id: t.id,
+              title: t.title,
+              category: t.category?.name || "Uncategorized",
+              priority: t.priority,
+              assignedTo: t.assignedTo?.name || null,
+              timeAgo: new Date(t.createdAt).toLocaleDateString(),
+            };
 
-          if (kanban.columns[t.status]) {
-            kanban.columns[t.status].ticketIds.push(t.id);
-          }
-        });
+            if (kanban.columns[t.status]) {
+              kanban.columns[t.status].ticketIds.push(t.id);
+            }
+          });
+        } else {
+          console.error("Expected array for kanban tickets, got:", ticketsData);
+        }
 
         setData(kanban);
       } catch (error) {

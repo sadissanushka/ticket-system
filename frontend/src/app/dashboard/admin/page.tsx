@@ -89,10 +89,25 @@ export default function AdminDashboardPage() {
         const [ticketsData, techsData] = await Promise.all([
           ticketsRes.json(), techsRes.json(),
         ]);
-        setTickets(ticketsData);
-        setTechnicians(techsData);
+        
+        // Defensive checks for arrays
+        if (Array.isArray(ticketsData)) {
+          setTickets(ticketsData);
+        } else {
+          console.error("Expected array for tickets, got:", ticketsData);
+          setTickets([]);
+        }
+
+        if (Array.isArray(techsData)) {
+          setTechnicians(techsData);
+        } else {
+          console.error("Expected array for technicians, got:", techsData);
+          setTechnicians([]);
+        }
       } catch (err) {
         console.error("Failed to load admin data", err);
+        setTickets([]);
+        setTechnicians([]);
       } finally {
         setIsLoading(false);
       }
