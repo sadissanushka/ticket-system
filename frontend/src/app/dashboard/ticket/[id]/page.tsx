@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
 import { FilePreviewModal } from "@/components/FilePreviewModal";
+import { EditTicketModal } from "@/components/EditTicketModal";
+import { useRouter } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -232,6 +234,7 @@ function useDropZone(onFiles: (files: File[]) => void) {
 
 export default function TicketDetailsPage() {
   const params = useParams();
+  const router = useRouter();
   const ticketId = params.id as string;
   const { user } = useAuth();
 
@@ -245,6 +248,8 @@ export default function TicketDetailsPage() {
   // File handling state
   const [pendingFiles, setPendingFiles] = useState<UploadedFile[]>([]);
   const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -369,6 +374,41 @@ export default function TicketDetailsPage() {
 
     setNewMessage("");
     setPendingFiles([]);
+  };
+
+  const handleDeleteTicket = async () => {
+    if (!window.confirm("Are you sure you want to delete this ticket? All messages and attachments will be permanently removed.")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const res = await fetchWithAuth(`${API_URL}/api/tickets/${ticketId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to delete ticket");
+      }
+
+      router.push("/dashboard");
+    } catch (err: any) {
+      alert(err.message || "Failed to delete ticket");
+      setIsDeleting(false);
+    }
+  };
+
+  const handleUpdateTicketDetails = (updated: any) => {
+    setTicket((prev) => prev ? { 
+      ...prev, 
+      title: updated.title,
+      description: updated.description,
+      priority: updated.priority,
+      location: updated.location,
+      device: updated.device,
+      categoryId: updated.categoryId,
+    } : null);
   };
 
   const currentStep = ticket ? STATUS_MAP[ticket.status] ?? 0 : 0;
@@ -681,10 +721,16 @@ export default function TicketDetailsPage() {
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="rounded-xl">
-                    <DropdownMenuItem>Edit Details</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">
-                      <Trash2 className="w-3.5 h-3.5 mr-2" />
+                  <DropdownMenuContent align="end" className="rounded-xl border-slate-200 dark:border-slate-800">
+                    <DropdownMenuItem onClick={() => setIsEditModalOpen(true)} className="cursor-pointer">
+                      Edit Details
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={handleDeleteTicket} 
+                      className="text-red-600 cursor-pointer focus:text-red-600"
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" /> : <Trash2 className="w-3.5 h-3.5 mr-2" />}
                       Delete Ticket
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -727,6 +773,23 @@ export default function TicketDetailsPage() {
         isOpen={!!previewFile}
         onClose={() => setPreviewFile(null)}
       />
+
+      {ticket && (
+        <EditTicketModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          ticket={{
+            id: ticket.id,
+            title: ticket.title,
+            description: ticket.description,
+            categoryId: (ticket as any).categoryId || "",
+            priority: ticket.priority,
+            location: ticket.location,
+            device: ticket.device,
+          }}
+          onUpdate={handleUpdateTicketDetails}
+        />
+      )}
     </div>
   );
 }

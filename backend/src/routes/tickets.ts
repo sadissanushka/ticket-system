@@ -124,7 +124,17 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
 
     const updatedTicket = await prisma.ticket.update({
       where: { id: ticketId },
-      data: { status, assignedToId, priority },
+      data: { 
+        status, 
+        assignedToId, 
+        priority,
+        // Allow updating details
+        title: req.body.title,
+        description: req.body.description,
+        location: req.body.location,
+        device: req.body.device,
+        categoryId: req.body.categoryId,
+      },
     });
 
     // Notify Tech on new assignment
@@ -156,6 +166,37 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Update ticket error:', error);
     res.status(500).json({ error: 'Failed to update ticket' });
+  }
+});
+
+// Delete a ticket
+router.delete('/:id', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const ticketId = id as string;
+
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+    
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+
+    // Authorization: Only Admins can delete any ticket.
+    // Authors can delete their own ticket ONLY if it is still OPEN.
+    const isAdmin = req.user!.role === 'ADMIN';
+    const isAuthor = ticket.authorId === req.user!.id;
+    const isDeletableByAuthor = isAuthor && ticket.status === 'OPEN';
+
+    if (!isAdmin && !isDeletableByAuthor) {
+      return res.status(403).json({ error: 'Access denied to delete this ticket' });
+    }
+
+    await prisma.ticket.delete({ where: { id: ticketId } });
+
+    res.json({ message: 'Ticket deleted successfully' });
+  } catch (error) {
+    console.error('Delete ticket error:', error);
+    res.status(500).json({ error: 'Failed to delete ticket' });
   }
 });
 
