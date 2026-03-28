@@ -141,8 +141,10 @@ export function EditTicketModal({ ticket, isOpen, onClose, onUpdate }: EditTicke
             <div className="space-y-2">
               <Label htmlFor="edit-category" className="text-sm font-semibold">Category</Label>
               <Select value={categoryId} onValueChange={(val) => setCategoryId(val || "")}>
-                <SelectTrigger id="edit-category" className="bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
-                  <SelectValue placeholder="Select Category" />
+                <SelectTrigger id="edit-category" className="bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 h-10 w-full overflow-hidden">
+                  <SelectValue>
+                    {categories.find(c => c.id === categoryId)?.name || "Select Category"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
@@ -155,7 +157,7 @@ export function EditTicketModal({ ticket, isOpen, onClose, onUpdate }: EditTicke
             <div className="space-y-2">
               <Label htmlFor="edit-priority" className="text-sm font-semibold">Priority</Label>
               <Select value={priority} onValueChange={(val) => setPriority(val || "")}>
-                <SelectTrigger id="edit-priority" className="bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                <SelectTrigger id="edit-priority" className="bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 h-10 w-full">
                   <SelectValue placeholder="Select Priority" />
                 </SelectTrigger>
                 <SelectContent>
