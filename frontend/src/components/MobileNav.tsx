@@ -10,7 +10,8 @@ import {
   Settings, 
   MonitorCheck,
   ShieldCheck,
-  Wrench
+  Wrench,
+  LogOut
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -21,7 +22,7 @@ const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -114,6 +115,18 @@ const MobileNav = () => {
               </Link>
             );
           })}
+          
+          {/* Logout item in list for mobile */}
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              logout();
+            }}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
+          >
+            <LogOut className="h-5 w-5" />
+            Logout
+          </button>
         </nav>
 
         <div className="p-4 border-t border-border shrink-0">

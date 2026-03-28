@@ -149,7 +149,7 @@ export default function TechnicianDashboardPage() {
         </div>
       </div>
 
-      <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+      <div className="bg-card rounded-xl shadow-sm border border-border overflow-x-auto">
         <div className="p-4 border-b border-border bg-muted/30 flex justify-between items-center">
           <h2 className="font-semibold text-lg text-foreground">Your Action Queue</h2>
           <div className="relative w-64 hidden sm:block">

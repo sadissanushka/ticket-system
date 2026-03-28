@@ -159,11 +159,11 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+      <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 overflow-x-auto">
         <Tabs defaultValue="all" className="w-full">
           {/* Tab Bar + Search */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <TabsList className="bg-muted">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+            <TabsList className="bg-muted p-1">
               <TabsTrigger value="all">
                 All
                 <span className="ml-1.5 text-[11px] font-bold bg-muted text-muted-foreground rounded-full px-1.5">{tickets.length}</span>
@@ -195,19 +195,19 @@ export default function DashboardPage() {
           </div>
 
           {/* All Tabs share the same TicketTable component, just with different filtered data */}
-          <TabsContent value="all" className="mt-0 border rounded-lg overflow-hidden">
+          <TabsContent value="all" className="mt-0 border rounded-lg">
             <TicketTable tickets={allTickets} isLoading={isLoading} />
           </TabsContent>
 
-          <TabsContent value="open" className="mt-0 border rounded-lg overflow-hidden">
+          <TabsContent value="open" className="mt-0 border rounded-lg">
             <TicketTable tickets={openTickets} isLoading={isLoading} />
           </TabsContent>
 
-          <TabsContent value="in-progress" className="mt-0 border rounded-lg overflow-hidden">
+          <TabsContent value="in-progress" className="mt-0 border rounded-lg">
             <TicketTable tickets={inProgressTickets} isLoading={isLoading} />
           </TabsContent>
 
-          <TabsContent value="resolved" className="mt-0 border rounded-lg overflow-hidden">
+          <TabsContent value="resolved" className="mt-0 border rounded-lg">
             <TicketTable tickets={resolvedTickets} isLoading={isLoading} />
           </TabsContent>
         </Tabs>

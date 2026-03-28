@@ -237,7 +237,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Ticket Table */}
-      <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden transition-all duration-300">
+      <div className="bg-card rounded-xl shadow-sm border border-border overflow-x-auto transition-all duration-300">
         <div className="p-4 border-b border-border bg-muted/30 flex flex-col sm:flex-row justify-between items-center gap-4">
           <h2 className="font-semibold text-lg text-foreground">All Tickets</h2>
           <div className="relative w-full sm:w-72">
