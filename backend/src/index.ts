@@ -59,7 +59,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
-const uploadsDir = path.join(process.cwd(), 'public/uploads');
+const uploadsDir = path.resolve(process.cwd(), 'public/uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
