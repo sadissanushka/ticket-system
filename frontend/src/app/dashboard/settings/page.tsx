@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchWithAuth } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,9 +52,8 @@ export default function SettingsPage() {
     setNotifications(nextState); // Optimistic UI update
     
     try {
-      const res = await fetch(`${API_URL}/api/users/${user.id}/notifications`, {
+      const res = await fetchWithAuth(`${API_URL}/api/users/${user.id}/notifications`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           notifyTickets: nextState.tickets,
           notifySystem: nextState.system
@@ -77,9 +76,8 @@ export default function SettingsPage() {
     if (!user) return;
     setIsSaving(true);
     try {
-      const res = await fetch(`${API_URL}/api/users/${user.id}`, {
+      const res = await fetchWithAuth(`${API_URL}/api/users/${user.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name })
       });
       if (res.ok) {
@@ -101,9 +99,8 @@ export default function SettingsPage() {
     if (!user || !currentPassword || !newPassword) return;
     setIsSavingPassword(true);
     try {
-      const res = await fetch(`${API_URL}/api/users/${user.id}/password`, {
+      const res = await fetchWithAuth(`${API_URL}/api/users/${user.id}/password`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ currentPassword, newPassword })
       });
       if (res.ok) {
@@ -127,7 +124,7 @@ export default function SettingsPage() {
     if (!user) return;
     if (window.confirm("Are you sure you want to permanently delete your account? This action cannot be undone and will delete all your tickets.")) {
       try {
-        const res = await fetch(`${API_URL}/api/users/${user.id}`, {
+        const res = await fetchWithAuth(`${API_URL}/api/users/${user.id}`, {
           method: "DELETE"
         });
         if (res.ok) {

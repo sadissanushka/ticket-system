@@ -1,11 +1,12 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { authenticate, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 const prisma = new PrismaClient();
 
 // Get all categories
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const categories = await prisma.category.findMany({
       orderBy: { name: 'asc' }

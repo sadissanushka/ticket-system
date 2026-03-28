@@ -10,7 +10,7 @@ import {
   ChevronRight, Upload, AlertCircle, Trash2, Settings, MoreVertical
 } from "lucide-react";
 import { io, Socket } from "socket.io-client";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchWithAuth } from "@/lib/api";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -256,8 +256,8 @@ export default function TicketDetailsPage() {
     async function init() {
       try {
         const [ticketRes, messagesRes] = await Promise.all([
-          fetch(`${API_URL}/api/tickets`),
-          fetch(`${API_URL}/api/messages/${ticketId}`),
+          fetchWithAuth(`${API_URL}/api/tickets`),
+          fetchWithAuth(`${API_URL}/api/messages/${ticketId}`),
         ]);
         const [allTickets, msgs] = await Promise.all([ticketRes.json(), messagesRes.json()]);
         const found = allTickets.find((t: TicketInfo) => t.id === ticketId);
@@ -314,7 +314,7 @@ export default function TicketDetailsPage() {
         const formData = new FormData();
         formData.append("file", f);
 
-        const res = await fetch(`${API_URL}/api/uploads`, {
+        const res = await fetchWithAuth(`${API_URL}/api/uploads`, {
           method: "POST",
           body: formData,
         });

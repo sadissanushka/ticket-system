@@ -18,3 +18,35 @@ export const ENDPOINTS = {
   MESSAGES: `${API_URL}/api/messages`,
   UPLOADS: `${API_URL}/api/uploads`,
 };
+
+/**
+ * Enhanced fetch wrapper that automatically adds the Bearer token
+ * from localStorage for authenticated requests.
+ */
+export async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem("helpdesk_token") : null;
+  
+  const headers = new Headers(options.headers || {});
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+  
+  // Default to JSON content type for POST/PUT if not specified
+  if ((options.method === 'POST' || options.method === 'PUT') && !headers.has('Content-Type') && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  const response = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  // Handle common unauthorized response
+  if (response.status === 401 && typeof window !== 'undefined') {
+    // Optional: Log out or redirect to login
+    // localStorage.removeItem("helpdesk_token");
+    // window.location.href = "/login";
+  }
+
+  return response;
+}

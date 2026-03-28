@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchWithAuth } from "@/lib/api";
 
 type Notification = {
   id: string;
@@ -36,7 +36,7 @@ export function NotificationsDropdown() {
 
     const fetchNotifications = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/notifications?userId=${user.id}`);
+        const res = await fetchWithAuth(`${API_URL}/api/notifications`);
         if (res.ok) {
           const data = await res.json();
           setNotifications(data);
@@ -57,7 +57,7 @@ export function NotificationsDropdown() {
 
   const handleMarkAsRead = async (id: string, ticketId?: string) => {
     try {
-      await fetch(`${API_URL}/api/notifications/${id}/read`, { method: "PUT" });
+      await fetchWithAuth(`${API_URL}/api/notifications/${id}/read`, { method: "PUT" });
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
       
       setIsOpen(false);
@@ -73,10 +73,8 @@ export function NotificationsDropdown() {
   const handleMarkAllAsRead = async () => {
     if (!user) return;
     try {
-      await fetch(`${API_URL}/api/notifications/read-all`, {
+      await fetchWithAuth(`${API_URL}/api/notifications/read-all`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id })
       });
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     } catch (err) {

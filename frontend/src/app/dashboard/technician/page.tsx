@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchWithAuth } from "@/lib/api";
 
 type TechnicianTicket = {
   id: string;
@@ -73,7 +73,7 @@ export default function TechnicianDashboardPage() {
     async function fetchTickets() {
       if (!user?.id) return;
       try {
-        const res = await fetch(`${API_URL}/api/tickets/assigned/${user.id}`);
+        const res = await fetchWithAuth(`${API_URL}/api/tickets/assigned/${user.id}`);
         const data = await res.json();
         setTickets(data);
       } catch (err) {
@@ -88,9 +88,8 @@ export default function TechnicianDashboardPage() {
   const handleUpdateStatus = async (ticketId: string, newStatus: string) => {
     setUpdatingId(ticketId);
     try {
-      const res = await fetch(`${API_URL}/api/tickets/${ticketId}`, {
+      const res = await fetchWithAuth(`${API_URL}/api/tickets/${ticketId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
       if (!res.ok) throw new Error("Failed to update status");

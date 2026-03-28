@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchWithAuth } from "@/lib/api";
 
 type Ticket = {
   id: string;
@@ -109,13 +109,9 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchMyTickets() {
       try {
-        const response = await fetch(`${API_URL}/api/tickets`);
+        const response = await fetchWithAuth(`${API_URL}/api/tickets`);
         const data = await response.json();
-        const myTickets =
-          user?.role === "STUDENT"
-            ? data.filter((t: Ticket) => t.authorId === user.id)
-            : data;
-        setTickets(myTickets);
+        setTickets(data);
       } catch (error) {
         console.error("Failed to fetch tickets", error);
       } finally {

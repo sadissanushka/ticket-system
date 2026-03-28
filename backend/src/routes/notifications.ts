@@ -1,22 +1,17 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { authenticate, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 const prisma = new PrismaClient();
 
-// Get all notifications for a given user
-// Typically in a JWT app, we would use a middleware to extract the `req.user.id`.
-// Since this app passes the userId via a query param `?userId=` for simplicity from the client side:
-router.get('/', async (req, res) => {
+// Get all notifications for the authenticated user
+router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({ error: 'userId is required' });
-    }
+    const userId = req.user!.id;
 
     const notifications = await prisma.notification.findMany({
-      where: { userId: String(userId) },
+      where: { userId },
       orderBy: { createdAt: 'desc' },
       take: 50 // limit to 50
     });
@@ -29,33 +24,37 @@ router.get('/', async (req, res) => {
 });
 
 // Mark a single notification as read
-router.put('/:id/read', async (req, res) => {
+router.put('/:id/read', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
+    const notificationId = id as string;
+    const userId = req.user!.id;
 
-    const notification = await prisma.notification.update({
-      where: { id },
+    // Ensure the notification belongs to the user
+    const notification = await prisma.notification.findUnique({ where: { id: notificationId } });
+    if (!notification || notification.userId !== userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const updated = await prisma.notification.update({
+      where: { id: notificationId },
       data: { isRead: true }
     });
 
-    res.json(notification);
+    res.json(updated);
   } catch (error) {
     console.error('Failed to mark notification as read', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Mark ALL notifications as read for a given user
-router.put('/read-all', async (req, res) => {
+// Mark ALL notifications as read for the authenticated user
+router.put('/read-all', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.body;
-
-    if (!userId) {
-      return res.status(400).json({ error: 'userId is required' });
-    }
+    const userId = req.user!.id;
 
     await prisma.notification.updateMany({
-      where: { userId: String(userId), isRead: false },
+      where: { userId, isRead: false },
       data: { isRead: true }
     });
 

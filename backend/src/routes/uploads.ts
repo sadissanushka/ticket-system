@@ -1,7 +1,8 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { authenticate, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 
@@ -26,10 +27,10 @@ const upload = multer({
 });
 
 // Single file upload
-router.post('/', (req, res, next) => {
+router.post('/', authenticate, (req: AuthRequest, res: Response, next) => {
   console.log('[Upload] POST /api/uploads received');
   next();
-}, upload.single('file'), (req, res) => {
+}, upload.single('file'), (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) {
       console.warn('[Upload] No file in request');

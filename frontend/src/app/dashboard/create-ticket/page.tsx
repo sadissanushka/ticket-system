@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchWithAuth } from "@/lib/api";
 
 type Category = { id: string; name: string };
 
@@ -39,7 +39,7 @@ export default function CreateTicketPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/categories`)
+    fetchWithAuth(`${API_URL}/api/categories`)
       .then((res) => res.json())
       .then(setCategories)
       .catch(() => setError("Could not load categories. Is the backend running?"));
@@ -65,7 +65,7 @@ export default function CreateTicketPage() {
         const formData = new FormData();
         formData.append("file", f);
 
-        const res = await fetch(`${API_URL}/api/uploads`, {
+        const res = await fetchWithAuth(`${API_URL}/api/uploads`, {
           method: "POST",
           body: formData,
         });
@@ -110,9 +110,8 @@ export default function CreateTicketPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/tickets`, {
+      const response = await fetchWithAuth(`${API_URL}/api/tickets`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
           description,

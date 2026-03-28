@@ -23,7 +23,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger,
 } from "@/components/ui/select";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchWithAuth } from "@/lib/api";
 
 // --- Types ---
 type AdminTicket = {
@@ -83,8 +83,8 @@ export default function AdminDashboardPage() {
     async function loadData() {
       try {
         const [ticketsRes, techsRes] = await Promise.all([
-          fetch(`${API_URL}/api/tickets`),
-          fetch(`${API_URL}/api/users/role/technician`),
+          fetchWithAuth(`${API_URL}/api/tickets`),
+          fetchWithAuth(`${API_URL}/api/users/role/technician`),
         ]);
         const [ticketsData, techsData] = await Promise.all([
           ticketsRes.json(), techsRes.json(),
@@ -110,9 +110,8 @@ export default function AdminDashboardPage() {
     setIsAssigning(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/tickets/${assignDialog.ticketId}`, {
+      const res = await fetchWithAuth(`${API_URL}/api/tickets/${assignDialog.ticketId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           assignedToId: selectedTechId,
           status: "ASSIGNED",

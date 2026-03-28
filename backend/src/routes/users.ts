@@ -1,12 +1,13 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { authenticate, authorize, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 const prisma = new PrismaClient();
 
-// Get all users
-router.get('/', async (req, res) => {
+// Get all users (Admin only)
+router.get('/', authenticate, authorize(['ADMIN']), async (req: AuthRequest, res: Response) => {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -23,12 +24,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get users by specific Role (e.g. to list active Technicians)
-router.get('/role/:role', async (req, res) => {
+// Get users by specific Role (Admin/Technician only)
+router.get('/role/:role', authenticate, authorize(['ADMIN', 'TECHNICIAN']), async (req: AuthRequest, res: Response) => {
   try {
-    const { role } = req.params;
-    // Map string param to Prisma enum
-    const uppercaseRole = role.toUpperCase() as any;
+    const roleParam = typeof req.params.role === 'string' ? req.params.role : '';
+    const uppercaseRole = roleParam.toUpperCase() as any;
 
     const users = await prisma.user.findMany({
       where: { role: uppercaseRole },
@@ -41,12 +41,19 @@ router.get('/role/:role', async (req, res) => {
   }
 });
 
-// Get a single user details
-router.get('/:id', async (req, res) => {
+// Get a single user details (Self or Admin)
+router.get('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
+    
+    const userId = id as string;
+    
+    if (req.user!.role !== 'ADMIN' && req.user!.id !== userId) {
+      return res.status(403).json({ error: 'Access denied to other user profile' });
+    }
+
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: userId },
       select: { id: true, name: true, email: true, role: true, department: true }
     });
 
@@ -60,14 +67,20 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update user profile
-router.put('/:id', async (req, res) => {
+// Update user profile (Self only)
+router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
 
+    const userId = id as string;
+
+    if (req.user!.id !== userId) {
+      return res.status(403).json({ error: 'You can only update your own profile' });
+    }
+
     const user = await prisma.user.update({
-      where: { id },
+      where: { id: userId },
       data: { name },
       select: { id: true, name: true, email: true, role: true, department: true }
     });
@@ -78,28 +91,32 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Update user password
-router.put('/:id/password', async (req, res) => {
+// Update user password (Self only)
+router.put('/:id/password', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { currentPassword, newPassword } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { id } });
+    const userId = id as string;
+
+    if (req.user!.id !== userId) {
+      return res.status(403).json({ error: 'You can only change your own password' });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Compare provided password with securely hashed stored password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Incorrect current password' });
     }
 
-    // Hash the new password before updating
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({
-      where: { id },
+      where: { id: userId },
       data: { password: hashedNewPassword }
     });
 
@@ -109,30 +126,36 @@ router.put('/:id/password', async (req, res) => {
   }
 });
 
-// Delete user account
-router.delete('/:id', async (req, res) => {
+// Delete user account (Admin or Self)
+router.delete('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
+    const userId = id as string;
+
+    if (req.user!.role !== 'ADMIN' && req.user!.id !== userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
     // Delete tickets created by this user
     await prisma.ticket.deleteMany({
-      where: { authorId: id }
+      where: { authorId: userId }
     });
 
     // Unassign tickets assigned to this user
     await prisma.ticket.updateMany({
-      where: { assignedToId: id },
+      where: { assignedToId: userId },
       data: { assignedToId: null }
     });
     
     // Delete messages sent by this user
     await prisma.message.deleteMany({
-      where: { senderId: id }
+      where: { senderId: userId }
     });
 
     // Delete the user
     await prisma.user.delete({
-      where: { id }
+      where: { id: userId }
     });
 
     res.json({ message: 'Account deleted successfully' });
@@ -142,14 +165,20 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Update user notifications
-router.put('/:id/notifications', async (req, res) => {
+// Update user notifications (Self only)
+router.put('/:id/notifications', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { notifyTickets, notifySystem } = req.body;
 
+    const userId = id as string;
+
+    if (req.user!.id !== userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
     const user = await prisma.user.update({
-      where: { id },
+      where: { id: userId },
       data: { notifyTickets, notifySystem },
       select: { id: true, notifyTickets: true, notifySystem: true }
     });

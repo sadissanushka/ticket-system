@@ -1,13 +1,21 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { authenticate, authorize, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 const prisma = new PrismaClient();
 
-// Get all tickets
-router.get('/', async (req, res) => {
+// Get tickets (Filtered by role)
+router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
+    const { role, id } = req.user!;
+    
+    // Students only see their own tickets
+    // Admins and Technicians see everything
+    const where = role === 'STUDENT' ? { authorId: id } : {};
+
     const tickets = await prisma.ticket.findMany({
+      where,
       include: {
         category: true,
         author: { select: { id: true, name: true, email: true } },
@@ -23,11 +31,17 @@ router.get('/', async (req, res) => {
 });
 
 // Get tickets assigned to a specific technician
-router.get('/assigned/:id', async (req, res) => {
+router.get('/assigned/:id', authenticate, authorize(['ADMIN', 'TECHNICIAN']), async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
+    
+    // Prevent technicians from seeing each other's private assigned queues unless they are admins
+    if (req.user!.role === 'TECHNICIAN' && req.user!.id !== id) {
+      return res.status(403).json({ error: 'Access denied to other technicians queue' });
+    }
+
     const tickets = await prisma.ticket.findMany({
-      where: { assignedToId: id },
+      where: { assignedToId: id as string },
       include: { 
         category: true, 
         author: { select: { id: true, name: true, email: true } } 
@@ -40,9 +54,10 @@ router.get('/assigned/:id', async (req, res) => {
 });
 
 // Create a new ticket
-router.post('/', async (req, res) => {
+router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, categoryId, priority, location, device, authorId, attachments } = req.body;
+    const { title, description, categoryId, priority, location, device, attachments } = req.body;
+    const authorId = req.user!.id; // Use authenticated ID
     
     const newTicket = await prisma.ticket.create({
       data: {
@@ -71,7 +86,7 @@ router.post('/', async (req, res) => {
     const admins = await prisma.user.findMany({ where: { role: 'ADMIN', notifyTickets: true } });
     if (admins.length > 0) {
       await prisma.notification.createMany({
-        data: admins.map(admin => ({
+        data: admins.map((admin: { id: string }) => ({
           userId: admin.id,
           message: `New ticket created: ${title}`,
           ticketId: newTicket.id
@@ -86,46 +101,60 @@ router.post('/', async (req, res) => {
 });
 
 // Update a ticket (Status, Assignment)
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { status, assignedToId, priority } = req.body;
+    const ticketId = id as string;
 
-    const existingTicket = await prisma.ticket.findUnique({ where: { id }, include: { author: true } });
+    const existingTicket = await prisma.ticket.findUnique({ 
+      where: { id: ticketId }, 
+      include: { author: true } 
+    });
+    
+    if (!existingTicket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+
+    // Authorization check: 
+    // Students can't update status or assignment 
+    if (req.user!.role === 'STUDENT' && (status || assignedToId)) {
+      return res.status(403).json({ error: 'Students cannot update ticket status or assignment' });
+    }
 
     const updatedTicket = await prisma.ticket.update({
-      where: { id },
+      where: { id: ticketId },
       data: { status, assignedToId, priority },
     });
 
-    if (existingTicket) {
-      // Notify Tech on new assignment
-      if (assignedToId && existingTicket.assignedToId !== assignedToId) {
-        const tech = await prisma.user.findUnique({ where: { id: assignedToId } });
-        if (tech?.notifyTickets) {
-          await prisma.notification.create({
-            data: {
-              userId: tech.id,
-              message: `You were assigned to ticket: ${existingTicket.title}`,
-              ticketId: id
-            }
-          });
-        }
-      }
-      // Notify Student on status change
-      if (status && existingTicket.status !== status && existingTicket.author.notifyTickets) {
+    // Notify Tech on new assignment
+    if (assignedToId && existingTicket.assignedToId !== assignedToId) {
+      const tech = await prisma.user.findUnique({ where: { id: assignedToId as string } });
+      if (tech?.notifyTickets) {
         await prisma.notification.create({
           data: {
-            userId: existingTicket.authorId,
-            message: `Your ticket status changed to ${status}`,
-            ticketId: id
+            userId: tech.id,
+            message: `You were assigned to ticket: ${existingTicket.title}`,
+            ticketId: ticketId
           }
         });
       }
     }
+    
+    // Notify Student on status change
+    if (status && existingTicket.status !== status && (existingTicket as any).author?.notifyTickets) {
+      await prisma.notification.create({
+        data: {
+          userId: existingTicket.authorId,
+          message: `Your ticket status changed to ${status}`,
+          ticketId: ticketId
+        }
+      });
+    }
 
     res.json(updatedTicket);
   } catch (error) {
+    console.error('Update ticket error:', error);
     res.status(500).json({ error: 'Failed to update ticket' });
   }
 });
