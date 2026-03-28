@@ -721,17 +721,21 @@ export default function TicketDetailsPage() {
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="rounded-xl border-slate-200 dark:border-slate-800">
-                    <DropdownMenuItem onClick={() => setIsEditModalOpen(true)} className="cursor-pointer">
-                      Edit Details
+                  <DropdownMenuContent align="end" className="rounded-xl border-slate-200 dark:border-slate-800 min-w-[200px] p-2 shadow-xl shadow-slate-200/20 dark:shadow-none">
+                    <DropdownMenuItem 
+                      onClick={() => setIsEditModalOpen(true)} 
+                      className="cursor-pointer flex items-center gap-2.5 py-2.5 px-3 rounded-lg focus:bg-slate-50 dark:focus:bg-slate-800 transition-colors"
+                    >
+                      <Settings className="w-4 h-4 text-slate-400" />
+                      <span className="font-semibold text-sm">Edit Details</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={handleDeleteTicket} 
-                      className="text-red-600 cursor-pointer focus:text-red-600"
+                      className="text-red-600 cursor-pointer focus:text-red-600 flex items-center gap-2.5 py-2.5 px-3 rounded-lg focus:bg-red-50 dark:focus:bg-red-950/30 transition-colors"
                       disabled={isDeleting}
                     >
-                      {isDeleting ? <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" /> : <Trash2 className="w-3.5 h-3.5 mr-2" />}
-                      Delete Ticket
+                      {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                      <span className="font-semibold text-sm">Delete Ticket</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -755,17 +759,6 @@ export default function TicketDetailsPage() {
             </CardContent>
           </Card>
 
-          {/* Quick upload card */}
-          <div
-            className="rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 p-4 text-center cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-all group"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="w-5 h-5 text-slate-300 dark:text-slate-600 group-hover:text-blue-400 mx-auto mb-2 transition-colors" />
-            <p className="text-xs font-medium text-slate-400 dark:text-slate-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
-              Upload files
-            </p>
-            <p className="text-[10px] text-slate-300 dark:text-slate-600 mt-0.5">or drag & drop into chat</p>
-          </div>
         </div>
       </div>
       <FilePreviewModal

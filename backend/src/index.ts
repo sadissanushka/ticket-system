@@ -144,6 +144,19 @@ io.on('connection', (socket) => {
   });
 });
 
+// Error handler for Multer & other Express issues
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ error: 'File too large (Max 10MB)' });
+  }
+  if (err.name === 'MulterError') {
+    return res.status(400).json({ error: `Upload error: ${err.message}` });
+  }
+  
+  console.error('[Global Error Handler]', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 // Start server
 server.listen(port, () => {
   console.log(`🚀 Server + Socket.io running on port ${port}`);
