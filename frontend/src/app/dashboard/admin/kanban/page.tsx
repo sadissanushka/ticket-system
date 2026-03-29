@@ -61,7 +61,7 @@ export default function KanbanBoardPage() {
 
     async function fetchTickets() {
       try {
-        const res = await fetchWithAuth(`${API_URL}/api/tickets`);
+        const res = await fetchWithAuth(`${API_URL}/api/tickets/all`);
         const ticketsData = await res.json();
         const kanban = emptyKanban();
 
