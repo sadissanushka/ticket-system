@@ -153,7 +153,7 @@ export default function TechnicianDashboardPage() {
         <div className="p-4 border-b border-border bg-muted/30 flex justify-between items-center">
           <h2 className="font-semibold text-lg text-foreground">Your Action Queue</h2>
           <div className="relative w-64 hidden sm:block">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search tasks..."
@@ -188,13 +188,13 @@ export default function TechnicianDashboardPage() {
                 className="hover:bg-primary/5 cursor-pointer transition-colors group"
                 onClick={() => router.push(`/dashboard/ticket/${ticket.id}`)}
               >
-                <TableCell className="font-mono font-medium text-primary text-sm">
+                <TableCell className="font-mono font-medium text-primary dark:text-blue-400 text-sm">
                   <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:underline">
                     {ticket.id.slice(0, 8)}
                   </Link>
                 </TableCell>
                 <TableCell className="font-medium text-foreground text-sm max-w-[120px] sm:max-w-[400px] truncate">
-                  <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:text-primary transition-colors">
+                  <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:text-primary dark:hover:text-blue-400 transition-colors">
                     {ticket.title}
                   </Link>
                 </TableCell>
@@ -208,7 +208,7 @@ export default function TechnicianDashboardPage() {
                 <TableCell><StatusBadge status={ticket.status} /></TableCell>
                 <TableCell className="text-right flex items-center justify-end gap-2 p-2">
                   <Link href={`/dashboard/ticket/${ticket.id}`} onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="sm" className="h-8 text-[11px] font-bold text-muted-foreground hover:text-primary">
+                    <Button variant="ghost" size="sm" className="h-8 text-[11px] font-bold text-muted-foreground hover:text-primary dark:hover:text-blue-400">
                       <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
                       View Details
                     </Button>

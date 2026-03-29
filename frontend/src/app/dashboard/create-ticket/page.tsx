@@ -184,7 +184,7 @@ export default function CreateTicketPage() {
         </div>
         <h2 className="text-2xl font-bold text-foreground">Ticket Submitted!</h2>
         <p className="text-muted-foreground max-w-sm">Your ticket has been saved to the database and assigned a tracking ID. Redirecting to your dashboard...</p>
-        <Loader2 className="h-5 w-5 animate-spin text-primary mt-2" />
+        <Loader2 className="h-5 w-5 animate-spin text-primary dark:text-blue-400 mt-2" />
       </div>
     );
   }
@@ -219,7 +219,7 @@ export default function CreateTicketPage() {
                   Please provide as much information as possible to help us resolve your issue quickly.
                 </CardDescription>
               </div>
-              <Badge variant="secondary" className="bg-blue-50 text-primary hover:bg-blue-100 flex gap-1 items-center px-3 py-1">
+              <Badge variant="secondary" className="bg-blue-50 text-primary dark:text-blue-400 hover:bg-blue-100 flex gap-1 items-center px-3 py-1">
                 <Info className="h-3.5 w-3.5" />
                 Est. response: 2 hrs
               </Badge>
@@ -334,7 +334,7 @@ export default function CreateTicketPage() {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <div className="bg-primary/5 p-3 rounded-full mb-3 group-hover:bg-primary/10 transition-colors">
-                  <UploadCloud className="h-6 w-6 text-primary" />
+                  <UploadCloud className="h-6 w-6 text-primary dark:text-blue-400" />
                 </div>
                 <p className="text-sm font-medium text-foreground/90">Click to upload or drag and drop</p>
                 <p className="text-xs text-muted-foreground mt-1">PNG, JPG, PDF up to 10MB</p>
@@ -345,7 +345,7 @@ export default function CreateTicketPage() {
                   {pendingFiles.map((file) => (
                     <div key={file.id} className="flex items-center gap-3 bg-muted/40 border border-border rounded-lg p-3 relative group">
                       <div className="bg-primary/10 p-2 rounded flex-shrink-0">
-                        <UploadCloud className="h-4 w-4 text-primary" />
+                        <UploadCloud className="h-4 w-4 text-primary dark:text-blue-400" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium truncate text-foreground">{file.name}</p>

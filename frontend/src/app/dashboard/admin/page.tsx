@@ -241,7 +241,7 @@ export default function AdminDashboardPage() {
         <div className="p-4 border-b border-border bg-muted/30 flex flex-col sm:flex-row justify-between items-center gap-4">
           <h2 className="font-semibold text-lg text-foreground">All Tickets</h2>
           <div className="relative w-full sm:w-72">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search by title or user..."
@@ -283,7 +283,7 @@ export default function AdminDashboardPage() {
                   className="hover:bg-primary/5 cursor-pointer transition-colors border-border group"
                   onClick={() => router.push(`/dashboard/ticket/${ticket.id}`)}
                 >
-                  <TableCell className="font-mono font-medium text-primary text-xs shrink-0">
+                  <TableCell className="font-mono font-medium text-primary dark:text-blue-400 text-xs shrink-0">
                     <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:underline">
                       {ticket.id.slice(0, 8)}
                     </Link>
@@ -299,7 +299,7 @@ export default function AdminDashboardPage() {
                     </div>
                   </TableCell>
                   <TableCell className="font-medium text-foreground text-sm max-w-[120px] sm:max-w-[400px] truncate">
-                    <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:text-primary transition-colors">
+                    <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:text-primary dark:hover:text-blue-400 transition-colors">
                       {ticket.title}
                     </Link>
                   </TableCell>
@@ -322,7 +322,7 @@ export default function AdminDashboardPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 text-xs text-primary font-medium"
+                          className="h-8 text-xs text-primary dark:text-blue-400 font-medium"
                           onClick={(e) => e.stopPropagation()}
                         >
                           Manage
@@ -338,12 +338,12 @@ export default function AdminDashboardPage() {
                             openAssignDialog(ticket);
                           }}
                         >
-                          <UserCheck className="h-4 w-4 text-primary" />
+                          <UserCheck className="h-4 w-4 text-primary dark:text-blue-400" />
                           Assign Technician
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="p-0">
-                          <Link href={`/dashboard/ticket/${ticket.id}`} className="cursor-pointer text-primary font-bold w-full px-2 py-1.5 flex items-center">
+                          <Link href={`/dashboard/ticket/${ticket.id}`} className="cursor-pointer text-primary dark:text-blue-400 font-bold w-full px-2 py-1.5 flex items-center">
                             View Full Details
                           </Link>
                         </DropdownMenuItem>
@@ -362,7 +362,7 @@ export default function AdminDashboardPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <UserCheck className="h-5 w-5 text-primary" />
+              <UserCheck className="h-5 w-5 text-primary dark:text-blue-400" />
               Assign Technician
             </DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground pt-1 line-clamp-2">

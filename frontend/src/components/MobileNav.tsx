@@ -131,7 +131,7 @@ const MobileNav = () => {
 
         <div className="p-4 border-t border-border shrink-0">
           <div className="bg-muted/40 rounded-xl p-4 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold border border-primary/10">
+            <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary dark:text-blue-400 text-sm font-bold border border-primary/10">
               {user?.name?.[0].toUpperCase() ?? "?"}
             </div>
             <div className="flex-1 overflow-hidden">

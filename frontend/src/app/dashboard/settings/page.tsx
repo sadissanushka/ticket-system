@@ -243,14 +243,14 @@ export default function SettingsPage() {
         <section className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden text-foreground">
           <div className="p-6 border-b border-border bg-muted/20">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
+              <User className="h-5 w-5 text-primary dark:text-blue-400" />
               Profile Information
             </h2>
           </div>
           <div className="p-6 space-y-6">
             <div className="flex items-center gap-6 pb-2">
               <div className="relative group">
-                <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-2xl font-bold border-2 border-primary/20 overflow-hidden">
+                <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary dark:text-blue-400 text-2xl font-bold border-2 border-primary/20 overflow-hidden">
                   {user?.profilePicture ? (
                     <img src={user.profilePicture} alt={user.name} className="h-full w-full object-cover" />
                   ) : (
@@ -258,7 +258,7 @@ export default function SettingsPage() {
                   )}
                   {isUploading && (
                     <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center">
-                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      <Loader2 className="h-5 w-5 animate-spin text-primary dark:text-blue-400" />
                     </div>
                   )}
                 </div>
@@ -271,7 +271,7 @@ export default function SettingsPage() {
                     <X className="h-4 w-4" />
                   </button>
                 ) : (
-                  <label className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-card border border-border flex items-center justify-center cursor-pointer shadow-sm hover:text-primary transition-colors group-hover:scale-110">
+                  <label className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-card border border-border flex items-center justify-center cursor-pointer shadow-sm hover:text-primary dark:hover:text-blue-400 transition-colors group-hover:scale-110">
                     <Camera className="h-4 w-4" />
                     <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} disabled={isUploading} />
                   </label>
@@ -290,7 +290,7 @@ export default function SettingsPage() {
                 <h3 className="font-semibold text-foreground">{user?.name}</h3>
                 <p className="text-sm text-muted-foreground">{user?.email}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-primary">{user?.role} ACCOUNT</p>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-primary dark:text-blue-400">{user?.role} ACCOUNT</p>
                 </div>
               </div>
             </div>
@@ -299,7 +299,7 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Full Name</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -310,7 +310,7 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email Address</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     value={email}
                     className="pl-9 h-10 rounded-xl bg-muted/10 border-border opacity-70"
@@ -332,7 +332,7 @@ export default function SettingsPage() {
         <section className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden text-foreground">
           <div className="p-6 border-b border-border bg-muted/20">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
+              <Shield className="h-5 w-5 text-primary dark:text-blue-400" />
               Security & Privacy
             </h2>
           </div>
@@ -421,7 +421,7 @@ export default function SettingsPage() {
         <section className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden text-foreground">
           <div className="p-6 border-b border-border bg-muted/20">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Bell className="h-5 w-5 text-primary" />
+              <Bell className="h-5 w-5 text-primary dark:text-blue-400" />
               Notification Preferences
             </h2>
           </div>
