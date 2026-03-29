@@ -332,6 +332,12 @@ export default function TicketDetailsPage() {
   // File handling
   const handleFiles = useCallback((files: File[]) => {
     files.forEach(async (f) => {
+      // 10MB validation
+      if (f.size > 10 * 1024 * 1024) {
+        alert(`File "${f.name}" is too large (Maximum 10MB allowed).`);
+        return;
+      }
+
       const tempId = crypto.randomUUID();
       const controller = new AbortController();
       uploadControllersRef.current.set(tempId, controller);

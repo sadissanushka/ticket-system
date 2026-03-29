@@ -160,6 +160,11 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File is too large (Maximum 10MB allowed).");
+      return;
+    }
+
     setIsUploading(true);
     
     // Initialize AbortController for cancellation
@@ -499,7 +504,7 @@ export default function SettingsPage() {
               </div>
               <Button
                 variant="destructive"
-                className="rounded-xl px-6 bg-red-600 hover:bg-red-700"
+                className="rounded-xl px-6 bg-red-600 hover:bg-red-700 text-white"
                 onClick={handleDeleteAccount}
               >
                 Delete Permanently

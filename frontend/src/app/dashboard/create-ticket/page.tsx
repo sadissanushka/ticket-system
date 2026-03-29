@@ -67,6 +67,12 @@ export default function CreateTicketPage() {
     if (files.length === 0) return;
 
     for (const f of files) {
+      // 10MB validation
+      if (f.size > 10 * 1024 * 1024) {
+        alert(`File "${f.name}" is too large (Maximum 10MB allowed).`);
+        continue;
+      }
+
       const tempId = crypto.randomUUID();
       const controller = new AbortController();
       uploadControllersRef.current.set(tempId, controller);
