@@ -80,7 +80,7 @@ function TicketTable({
               <TableCell className="font-mono font-medium text-primary dark:text-blue-400 text-xs">
                 {ticket.id.slice(0, 8)}
               </TableCell>
-              <TableCell className="font-medium text-foreground group-hover:text-primary dark:group-hover:text-blue-400" dark:hover:text-blue-400 transition-colors max-w-[150px] sm:max-w-[400px] truncate">
+              <TableCell className="font-medium text-foreground group-hover:text-primary dark:group-hover:text-blue-400 transition-colors max-w-[150px] sm:max-w-[400px] truncate">
                 {ticket.title}
               </TableCell>
               <TableCell className="text-muted-foreground">

@@ -214,7 +214,7 @@ export default function KanbanBoardPage() {
                                       </div>
                                     </div>
 
-                                    <p className="font-bold text-foreground text-sm leading-tight mb-4 group-hover:text-primary dark:group-hover:text-blue-400" dark:hover:text-blue-400 transition-colors">
+                                    <p className="font-bold text-foreground text-sm leading-tight mb-4 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">
                                       {ticket.title}
                                     </p>
 

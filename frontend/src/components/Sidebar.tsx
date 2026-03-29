@@ -104,7 +104,7 @@ const Sidebar = () => {
             >
               <item.icon className={cn(
                 "h-4 w-4 transition-colors",
-                isActive ? "text-primary dark:text-blue-400-foreground" : "text-muted-foreground group-hover:text-primary dark:group-hover:text-blue-400" dark:hover:text-blue-400"
+                isActive ? "text-primary dark:text-blue-400-foreground" : "text-muted-foreground group-hover:text-primary dark:group-hover:text-blue-400"
               )} />
               <span className="flex-1">{item.name}</span>
               {isActive && <ChevronRight className="h-3 w-3 opacity-50" />}
