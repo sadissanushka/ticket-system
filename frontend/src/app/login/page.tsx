@@ -125,7 +125,7 @@ function LoginFields() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link href="/forgot-password" title="Forgot password?" className="text-sm font-medium text-primary dark:text-blue-400 hover:underline">
+              <Link href="/forgot-password" title="Forgot password?" className="text-sm font-medium text-primary hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -149,7 +149,7 @@ function LoginFields() {
       </CardContent>
       <CardFooter className="flex flex-col border-t p-6 bg-muted/30 rounded-b-lg">
         <p className="text-sm text-center mt-4">
-          Don't have an account? <Link href="/register" className="text-primary dark:text-blue-400 font-bold hover:underline">Register now</Link>
+          Don't have an account? <Link href="/register" className="text-primary font-bold hover:underline">Register now</Link>
         </p>
       </CardFooter>
     </Card>
@@ -171,7 +171,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center justify-center text-center">
           <div className="bg-primary p-3 rounded-2xl shadow-lg mb-6">
-            <MonitorCheck className="h-10 w-10 text-primary dark:text-blue-400-foreground" />
+            <MonitorCheck className="h-10 w-10 text-primary-foreground" />
           </div>
           <h2 className="text-3xl font-extrabold text-foreground tracking-tight">UniTech Assist</h2>
           <p className="mt-2 text-sm text-muted-foreground">University IT Help Desk: Ticket Manager</p>
@@ -179,7 +179,7 @@ export default function LoginPage() {
 
         <Suspense fallback={
           <Card className="shadow-xl border-border p-8 flex justify-center items-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary dark:text-blue-400" />
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </Card>
         }>
           <LoginFields />

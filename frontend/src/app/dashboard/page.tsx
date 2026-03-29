@@ -77,10 +77,10 @@ function TicketTable({
               className="hover:bg-primary/5 cursor-pointer transition-colors group"
               onClick={() => router.push(`/dashboard/ticket/${ticket.id}`)}
             >
-              <TableCell className="font-mono font-medium text-primary dark:text-blue-400 text-xs">
+              <TableCell className="font-mono font-medium text-primary text-xs">
                 {ticket.id.slice(0, 8)}
               </TableCell>
-              <TableCell className="font-medium text-foreground group-hover:text-primary dark:group-hover:text-blue-400 transition-colors max-w-[150px] sm:max-w-[400px] truncate">
+              <TableCell className="font-medium text-foreground group-hover:text-primary transition-colors max-w-[150px] sm:max-w-[400px] truncate">
                 {ticket.title}
               </TableCell>
               <TableCell className="text-muted-foreground">
@@ -183,7 +183,7 @@ export default function DashboardPage() {
             </TabsList>
 
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search tickets..."

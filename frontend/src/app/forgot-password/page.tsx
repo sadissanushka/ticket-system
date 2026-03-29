@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center justify-center text-center">
           <div className="bg-primary/10 p-4 rounded-full mb-6">
-            <KeyRound className="h-10 w-10 text-primary dark:text-blue-400" />
+            <KeyRound className="h-10 w-10 text-primary" />
           </div>
           <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Forgot Password</h2>
           <p className="mt-2 text-sm text-muted-foreground">Enter your details to receive an authentication code.</p>
@@ -111,7 +111,7 @@ export default function ForgotPasswordPage() {
           </CardContent>
           <CardFooter className="flex justify-center border-t p-4 bg-muted/20">
             <p className="text-xs text-muted-foreground">
-              Remembered your password? <Link href="/login" className="text-primary dark:text-blue-400 font-semibold hover:underline">Sign In</Link>
+              Remembered your password? <Link href="/login" className="text-primary font-semibold hover:underline">Sign In</Link>
             </p>
           </CardFooter>
         </Card>

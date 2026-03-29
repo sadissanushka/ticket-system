@@ -62,7 +62,7 @@ export default function LandingPage() {
         <div className="flex items-center gap-2">
           <Link href="#hero" className="flex items-center gap-2">
             <div className="bg-primary p-2 rounded-lg">
-              <MonitorCheck className="h-6 w-6 text-primary dark:text-blue-400-foreground" />
+              <MonitorCheck className="h-6 w-6 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl text-foreground tracking-tight">UniTech Assist</span>
           </Link>
@@ -73,8 +73,8 @@ export default function LandingPage() {
               key={link.href}
               href={link.href} 
               className={cn(
-                "relative py-1 transition-colors hover:text-primary dark:hover:text-blue-400",
-                activeSection === link.id ? "text-primary dark:text-blue-400" : "text-muted-foreground"
+                "relative py-1 transition-colors hover:text-primary",
+                activeSection === link.id ? "text-primary" : "text-muted-foreground"
               )}
             >
               {link.name}
@@ -88,7 +88,7 @@ export default function LandingPage() {
           <ThemeToggle />
           <div className="hidden sm:flex gap-4">
             <Link href="/dashboard">
-              <Button variant="ghost" className="font-medium text-foreground/80 hover:text-primary dark:hover:text-blue-400">
+              <Button variant="ghost" className="font-medium text-foreground/80 hover:text-primary">
                 Sign In
               </Button>
             </Link>
@@ -109,7 +109,7 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(20,82,218,0.1),transparent)] z-0" />
           
           <div className="max-w-4xl space-y-6 relative z-10">
-            <div className="inline-block rounded-full bg-primary/10 border border-primary/20 px-4 py-1.5 text-sm font-semibold text-primary dark:text-blue-400 mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="inline-block rounded-full bg-primary/10 border border-primary/20 px-4 py-1.5 text-sm font-semibold text-primary mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
               ✨ University IT Help Desk: Ticket Manager
             </div>
             <h1 className="text-5xl mt-4 md:text-7xl font-extrabold tracking-tight text-foreground drop-shadow-sm leading-[1.1] animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -144,7 +144,7 @@ export default function LandingPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Feature 1 */}
               <div className="group p-8 rounded-2xl bg-card border border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary dark:text-blue-400 mb-6 ring-4 ring-primary/5">
+                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-6 ring-4 ring-primary/5">
                   <LayoutDashboard className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Real-time Dashboard</h3>
@@ -214,7 +214,7 @@ export default function LandingPage() {
               {/* Step 1 */}
               <div className="group flex flex-col items-center text-center space-y-4 relative z-10">
                 <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center mb-4 ring-8 ring-primary/10 shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-                  <TicketPlus className="h-9 w-9 text-primary dark:text-blue-400-foreground" />
+                  <TicketPlus className="h-9 w-9 text-primary-foreground" />
                 </div>
                 <h3 className="text-xl font-bold">1. Submit a Ticket</h3>
                 <p className="text-muted-foreground">Easily describe your issue, attach screenshots, and categorize the problem in seconds.</p>
@@ -228,7 +228,7 @@ export default function LandingPage() {
                 <h3 className="text-xl font-bold">2. Support Team Assigned</h3>
                 <p className="text-muted-foreground">
                   Admins review your ticket and assign it to the right technician using our smart&nbsp;
-                  <Link href="https://en.wikipedia.org/wiki/Kanban%20board" target="_blank" rel="noopener noreferrer" className="text-primary dark:text-blue-400 hover:underline font-medium decoration-primary/30 underline-offset-4">
+                  <Link href="https://en.wikipedia.org/wiki/Kanban%20board" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium decoration-primary/30 underline-offset-4">
                     Kanban board
                   </Link>
                   .
@@ -259,27 +259,27 @@ export default function LandingPage() {
                 
                 <div className="grid gap-6">
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-primary dark:text-blue-400 border border-border">
+                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-primary border border-border">
                       <Mail className="h-5 w-5" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Email Us</p>
-                      <a href="mailto:support@univ-it.edu" className="text-lg font-semibold hover:text-primary dark:hover:text-blue-400 transition-colors">support@univ-it.edu</a>
+                      <a href="mailto:support@univ-it.edu" className="text-lg font-semibold hover:text-primary transition-colors">support@univ-it.edu</a>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-primary dark:text-blue-400 border border-border">
+                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-primary border border-border">
                       <Phone className="h-5 w-5" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Call Help Desk</p>
-                      <a href="tel:+94702345678" className="text-lg font-semibold hover:text-primary dark:hover:text-blue-400 transition-colors">+94 (70) 234-5678</a>
+                      <a href="tel:+94702345678" className="text-lg font-semibold hover:text-primary transition-colors">+94 (70) 234-5678</a>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-primary dark:text-blue-400 border border-border">
+                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-primary border border-border">
                       <MapPin className="h-5 w-5" />
                     </div>
                     <div>
@@ -299,11 +299,11 @@ export default function LandingPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center py-2 border-b border-border/50">
                     <span className="font-medium">Monday - Friday</span>
-                    <span className="text-primary dark:text-blue-400 font-bold">8:00 AM - 6:00 PM</span>
+                    <span className="text-primary font-bold">8:00 AM - 6:00 PM</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-border/50">
                     <span className="font-medium">Saturday</span>
-                    <span className="text-primary dark:text-blue-400 font-bold">9:00 AM - 1:00 PM</span>
+                    <span className="text-primary font-bold">9:00 AM - 1:00 PM</span>
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <span className="font-medium">Sunday</span>
@@ -328,15 +328,15 @@ export default function LandingPage() {
           <div className="flex flex-col items-center gap-4">
             <div className="flex items-center gap-2 opacity-80 mb-2">
               <div className="bg-primary p-1.5 rounded-md">
-                <MonitorCheck className="h-4 w-4 text-primary dark:text-blue-400-foreground" />
+                <MonitorCheck className="h-4 w-4 text-primary-foreground" />
               </div>
               <span className="font-bold text-lg text-foreground tracking-tight">UniTech Assist</span>
             </div>
             <nav className="flex gap-6 mb-6">
-              <Link href="#features" className="text-sm text-muted-foreground hover:text-primary dark:hover:text-blue-400">Features</Link>
-              <Link href="#how-it-works" className="text-sm text-muted-foreground hover:text-primary dark:hover:text-blue-400">How it Works</Link>
-              <Link href="#contact" className="text-sm text-muted-foreground hover:text-primary dark:hover:text-blue-400">Contact</Link>
-              <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-primary dark:hover:text-blue-400">Login</Link>
+              <Link href="#features" className="text-sm text-muted-foreground hover:text-primary">Features</Link>
+              <Link href="#how-it-works" className="text-sm text-muted-foreground hover:text-primary">How it Works</Link>
+              <Link href="#contact" className="text-sm text-muted-foreground hover:text-primary">Contact</Link>
+              <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-primary">Login</Link>
             </nav>
             <p className="text-muted-foreground text-sm opacity-60">
               © {new Date().getFullYear()} UniTech Assist. Empowering university IT support.

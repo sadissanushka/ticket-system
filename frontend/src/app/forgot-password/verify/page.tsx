@@ -132,7 +132,7 @@ export default function VerifyOTPPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center justify-center text-center">
           <div className="bg-primary/10 p-4 rounded-full mb-6">
-            <ShieldCheck className="h-10 w-10 text-primary dark:text-blue-400" />
+            <ShieldCheck className="h-10 w-10 text-primary" />
           </div>
           <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Verify Account</h2>
           <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
@@ -182,7 +182,7 @@ export default function VerifyOTPPage() {
               Didn't receive code?
               <Button 
                 variant="link" 
-                className="h-auto p-0 ml-1 text-primary dark:text-blue-400 font-bold decoration-2"
+                className="h-auto p-0 ml-1 text-primary font-bold decoration-2"
                 disabled={!canResend}
                 onClick={handleResend}
               >

@@ -153,7 +153,7 @@ export default function KanbanBoardPage() {
       </div>
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary dark:text-blue-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
         /* Kanban Board Area */
@@ -205,7 +205,7 @@ export default function KanbanBoardPage() {
                                       <div className="flex items-center gap-1">
                                         {ticket.assignedTo && (
                                           <Avatar className="h-6 w-6 border border-border bg-muted" title={`Assigned to ${ticket.assignedTo}`}>
-                                            <AvatarFallback className="text-[10px] bg-primary/10 text-primary dark:text-blue-400 font-bold">
+                                            <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
                                               {ticket.assignedTo.charAt(0)}
                                             </AvatarFallback>
                                           </Avatar>
@@ -214,7 +214,7 @@ export default function KanbanBoardPage() {
                                       </div>
                                     </div>
 
-                                    <p className="font-bold text-foreground text-sm leading-tight mb-4 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">
+                                    <p className="font-bold text-foreground text-sm leading-tight mb-4 group-hover:text-primary transition-colors">
                                       {ticket.title}
                                     </p>
 

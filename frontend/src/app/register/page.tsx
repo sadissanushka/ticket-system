@@ -120,7 +120,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center justify-center text-center">
           <div className="bg-primary p-3 rounded-2xl shadow-lg mb-6">
-            <MonitorCheck className="h-10 w-10 text-primary dark:text-blue-400-foreground" />
+            <MonitorCheck className="h-10 w-10 text-primary-foreground" />
           </div>
           <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Create Account</h2>
           <p className="mt-2 text-sm text-muted-foreground">Join the UniTech Assist IT Help Desk</p>
@@ -242,7 +242,7 @@ export default function RegisterPage() {
           </CardContent>
           <CardFooter className="flex flex-col border-t p-6 bg-muted/30 rounded-b-lg">
             <p className="text-sm text-center text-muted-foreground">
-              Already have an account? <Link href="/login" className="text-primary dark:text-blue-400 font-bold hover:underline">Sign In</Link>
+              Already have an account? <Link href="/login" className="text-primary font-bold hover:underline">Sign In</Link>
             </p>
           </CardFooter>
         </Card>

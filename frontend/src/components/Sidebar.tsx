@@ -80,7 +80,7 @@ const Sidebar = () => {
       <div className="flex h-16 items-center px-6 border-b border-border">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="bg-primary p-1.5 rounded-md shadow-sm">
-            <MonitorCheck className="h-5 w-5 text-primary dark:text-blue-400-foreground" />
+            <MonitorCheck className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="font-bold text-lg text-foreground tracking-tight">
             UniTech Assist
@@ -98,13 +98,13 @@ const Sidebar = () => {
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group",
                 isActive 
-                  ? "bg-primary text-primary dark:text-blue-400-foreground shadow-md shadow-primary/20" 
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
             >
               <item.icon className={cn(
                 "h-4 w-4 transition-colors",
-                isActive ? "text-primary dark:text-blue-400-foreground" : "text-muted-foreground group-hover:text-primary dark:group-hover:text-blue-400"
+                isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"
               )} />
               <span className="flex-1">{item.name}</span>
               {isActive && <ChevronRight className="h-3 w-3 opacity-50" />}
@@ -116,7 +116,7 @@ const Sidebar = () => {
       <div className="p-4 border-t border-border mt-auto">
         <div className="bg-muted/40 rounded-xl p-2 flex items-center gap-2">
             <Link href="/dashboard/settings" className="flex-1 flex items-center gap-3 p-1 rounded-lg hover:bg-muted transition-colors text-left outline-none cursor-pointer">
-              <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary dark:text-blue-400 text-xs font-bold shrink-0 border border-primary/10 overflow-hidden">
+              <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold shrink-0 border border-primary/10 overflow-hidden">
                 {user?.profilePicture ? (
                   <img src={user.profilePicture} alt={user.name} className="h-full w-full object-cover" />
                 ) : (
@@ -131,7 +131,7 @@ const Sidebar = () => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary dark:hover:text-blue-400 outline-none focus-visible:ring-1">
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary outline-none focus-visible:ring-1">
                   <Settings className="h-[1.2rem] w-[1.2rem]" />
                 </Button>
               </DropdownMenuTrigger>

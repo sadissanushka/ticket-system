@@ -101,7 +101,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center justify-center text-center">
           <div className="bg-primary/10 p-4 rounded-full mb-6">
-            <Lock className="h-10 w-10 text-primary dark:text-blue-400" />
+            <Lock className="h-10 w-10 text-primary" />
           </div>
           <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Set New Password</h2>
           <p className="mt-2 text-sm text-muted-foreground">Choose a strong password to secure your account.</p>

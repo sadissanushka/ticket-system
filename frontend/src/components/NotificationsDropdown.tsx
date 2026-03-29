@@ -104,7 +104,7 @@ export function NotificationsDropdown() {
         <div className="flex items-center justify-between px-4 py-2 bg-muted/30">
           <DropdownMenuLabel className="font-semibold text-sm p-0">Notifications</DropdownMenuLabel>
           {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-primary dark:text-blue-400" onClick={handleMarkAllAsRead}>
+            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-primary" onClick={handleMarkAllAsRead}>
               Mark all read
             </Button>
           )}
