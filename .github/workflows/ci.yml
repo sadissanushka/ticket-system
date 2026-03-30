@@ -23,14 +23,25 @@ jobs:
         cache: 'npm'
         cache-dependency-path: './backend/package-lock.json'
         
-    - name: Install dependencies
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.26.x'
+        cache-dependency-path: './backend/go.sum'
+
+    - name: Install Node dependencies
       run: npm ci || npm install
       
     - name: Generate Prisma Client
       run: npx prisma generate
       
-    - name: Build backend
+    - name: Build backend (Node)
       run: npm run build
+
+    - name: Build Admin Tool (Go)
+      run: |
+        go mod download
+        go build -o admin-tool ./cmd/admin-cli/main.go
 
 
   deploy-backend:
@@ -48,8 +59,10 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ticket-system/backend
-          git pull origin main
+          git fetch --all
+          git reset --hard origin/main
           npm install
           npx prisma generate
           npm run build
+          go build -o admin-tool ./cmd/admin-cli/main.go
           pm2 restart helpdesk-backend
