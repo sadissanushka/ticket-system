@@ -61,6 +61,7 @@ We use a free tier AWS EC2 virtual machine so the backend Node.js server runs 24
    server {
        listen 80 default_server;
        server_name _;
+       client_max_body_size 10M;
        location / {
            proxy_pass http://127.0.0.1:5000;
            proxy_http_version 1.1;

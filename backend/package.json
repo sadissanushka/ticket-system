@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "build": "tsc",
-    "start": "node dist/src/index.js"
+    "start": "node dist/src/index.js",
+    "admin": "go run cmd/admin-cli/main.go"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -16,13 +17,16 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@clack/prompts": "^1.1.0",
     "@prisma/client": "^5.15.0",
     "bcrypt": "^6.0.0",
+    "boxen": "^8.0.1",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.4",
+    "picocolors": "^1.1.1",
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
