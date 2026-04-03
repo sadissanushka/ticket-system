@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Search, PlayCircle, MessageSquare, Loader2, Clock } from "lucide-react";
+import { CheckCircle2, Search, PlayCircle, MessageSquare, Loader2, Clock, UserPlus, ClipboardList, InboxIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,8 +24,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
-import { API_URL, fetchWithAuth } from "@/lib/api";
+import { API_URL, fetchWithAuth, ENDPOINTS } from "@/lib/api";
 
 type TechnicianTicket = {
   id: string;
@@ -39,6 +40,8 @@ type TechnicianTicket = {
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
+    case "OPEN":
+      return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50">Open</Badge>;
     case "ASSIGNED":
       return <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800/50">Assigned</Badge>;
     case "IN_PROGRESS":
@@ -66,44 +69,65 @@ function PriorityBadge({ priority }: { priority: string }) {
 export default function TechnicianDashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [tickets, setTickets] = useState<TechnicianTicket[]>([]);
+  const [assignedTickets, setAssignedTickets] = useState<TechnicianTicket[]>([]);
+  const [unassignedTickets, setUnassignedTickets] = useState<TechnicianTicket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUnassignedLoading, setIsUnassignedLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchTickets() {
+    async function fetchAssignedTickets() {
       if (!user?.id) return;
       try {
-        const res = await fetchWithAuth(`${API_URL}/api/tickets/assigned/${user.id}`);
+        const res = await fetchWithAuth(ENDPOINTS.TICKETS.ASSIGNED(user.id));
         const data = await res.json();
         
         if (Array.isArray(data)) {
-          setTickets(data);
+          setAssignedTickets(data);
         } else {
-          console.error("Expected array for technician tickets, got:", data);
-          setTickets([]);
+          setAssignedTickets([]);
         }
       } catch (err) {
         console.error("Failed to fetch technician tickets", err);
-        setTickets([]);
+        setAssignedTickets([]);
       } finally {
         setIsLoading(false);
       }
     }
-    fetchTickets();
+
+    async function fetchUnassignedTickets() {
+      try {
+        const res = await fetchWithAuth(ENDPOINTS.TICKETS.UNASSIGNED);
+        const data = await res.json();
+        
+        if (Array.isArray(data)) {
+          setUnassignedTickets(data);
+        } else {
+          setUnassignedTickets([]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch unassigned tickets", err);
+        setUnassignedTickets([]);
+      } finally {
+        setIsUnassignedLoading(false);
+      }
+    }
+
+    fetchAssignedTickets();
+    fetchUnassignedTickets();
   }, [user?.id]);
 
   const handleUpdateStatus = async (ticketId: string, newStatus: string) => {
     setUpdatingId(ticketId);
     try {
-      const res = await fetchWithAuth(`${API_URL}/api/tickets/${ticketId}`, {
+      const res = await fetchWithAuth(`${ENDPOINTS.TICKETS.BASE}/${ticketId}`, {
         method: "PUT",
         body: JSON.stringify({ status: newStatus }),
       });
       if (!res.ok) throw new Error("Failed to update status");
       
-      setTickets(prev => prev.map(t => t.id === ticketId ? { ...t, status: newStatus } : t));
+      setAssignedTickets(prev => prev.map(t => t.id === ticketId ? { ...t, status: newStatus } : t));
     } catch (err) {
       console.error("Update failed", err);
     } finally {
@@ -111,21 +135,51 @@ export default function TechnicianDashboardPage() {
     }
   };
 
-  const filteredTickets = tickets.filter(t => 
+  const handleClaimTicket = async (ticketId: string) => {
+    if (!user?.id) return;
+    setUpdatingId(ticketId);
+    try {
+      const res = await fetchWithAuth(`${ENDPOINTS.TICKETS.BASE}/${ticketId}`, {
+        method: "PUT",
+        body: JSON.stringify({ assignedToId: user.id, status: "ASSIGNED" }),
+      });
+      if (!res.ok) throw new Error("Failed to claim ticket");
+      
+      // Move from unassigned to assigned
+      const claimedTicket = unassignedTickets.find(t => t.id === ticketId);
+      if (claimedTicket) {
+        const updatedTicket = { ...claimedTicket, status: "ASSIGNED" };
+        setAssignedTickets(prev => [updatedTicket, ...prev]);
+        setUnassignedTickets(prev => prev.filter(t => t.id !== ticketId));
+      }
+    } catch (err) {
+      console.error("Claim failed", err);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const filteredAssigned = assignedTickets.filter(t => 
     t.title.toLowerCase().includes(search.toLowerCase()) ||
     t.author.name.toLowerCase().includes(search.toLowerCase()) ||
-    t.author.email.toLowerCase().includes(search.toLowerCase())
+    t.id.toLowerCase().includes(search.toLowerCase())
   );
 
-  const inProgressCount = tickets.filter(t => t.status === "IN_PROGRESS").length;
-  const assignedCount = tickets.filter(t => t.status === "ASSIGNED").length;
+  const filteredUnassigned = unassignedTickets.filter(t => 
+    t.title.toLowerCase().includes(search.toLowerCase()) ||
+    t.author.name.toLowerCase().includes(search.toLowerCase()) ||
+    t.id.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const inProgressCount = assignedTickets.filter(t => t.status === "IN_PROGRESS").length;
+  const pendingCount = assignedTickets.filter(t => t.status === "ASSIGNED").length;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">My Assigned Tasks</h1>
-          <p className="text-muted-foreground mt-1">Manage and resolve tickets assigned to you.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Technician Workspace</h1>
+          <p className="text-muted-foreground mt-1">Manage assigned tasks and claim new requests.</p>
         </div>
         <div className="flex gap-4">
           <div className="bg-orange-50/10 dark:bg-orange-950/20 border border-orange-200/50 dark:border-orange-800/30 rounded-lg px-4 py-2 flex items-center gap-3">
@@ -139,140 +193,226 @@ export default function TechnicianDashboardPage() {
           </div>
           <div className="bg-blue-50/10 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30 rounded-lg px-4 py-2 flex items-center gap-3">
              <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-               <span className="text-blue-600 dark:text-blue-400 font-bold">{assignedCount}</span>
+               <span className="text-blue-600 dark:text-blue-400 font-bold">{unassignedTickets.length}</span>
              </div>
              <div>
-               <p className="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">Pending</p>
-               <p className="text-sm font-medium text-foreground leading-none mt-0.5">New assignments</p>
+               <p className="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">Available</p>
+               <p className="text-sm font-medium text-foreground leading-none mt-0.5">Unassigned</p>
              </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-card rounded-xl shadow-sm border border-border overflow-x-auto">
-        <div className="p-4 border-b border-border bg-muted/30 flex justify-between items-center">
-          <h2 className="font-semibold text-lg text-foreground">Your Action Queue</h2>
-          <div className="relative w-64 hidden sm:block">
-            <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search tasks..."
-              className="pl-9 h-9 bg-background border-border focus-visible:ring-primary/20 transition-all"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search tickets..."
+            className="pl-9 h-10 bg-card border-border focus-visible:ring-primary/20 transition-all"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
+      </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/40 hover:bg-muted/40 transition-colors border-border">
-              <TableHead className="w-[80px] font-bold text-[10px] uppercase tracking-wider text-muted-foreground">ID</TableHead>
-              <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-left px-4">Title</TableHead>
-              <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-left px-4">Requester</TableHead>
-              <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-left px-4">Priority</TableHead>
-              <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-left px-4">Status</TableHead>
-              <TableHead className="text-right font-bold text-[10px] uppercase tracking-wider text-muted-foreground px-4">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center">
-                  <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
-                </TableCell>
-              </TableRow>
-            ) : filteredTickets.map((ticket) => (
-              <TableRow
-                key={ticket.id}
-                className="hover:bg-primary/5 cursor-pointer transition-colors group"
-                onClick={() => router.push(`/dashboard/ticket/${ticket.id}`)}
-              >
-                <TableCell className="font-mono font-medium text-primary dark:text-blue-400 text-sm">
-                  <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:underline">
-                    {ticket.id.slice(0, 8)}
-                  </Link>
-                </TableCell>
-                <TableCell className="font-medium text-foreground text-sm max-w-[120px] sm:max-w-[400px] truncate">
-                  <Link href={`/dashboard/ticket/${ticket.id}`} className="hover:text-primary dark:hover:text-blue-400 transition-colors">
-                    {ticket.title}
-                  </Link>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  <div className="flex flex-col">
-                    <span className="text-foreground font-medium">{ticket.author.name}</span>
-                    <span className="text-[11px]">{ticket.author.email}</span>
-                  </div>
-                </TableCell>
-                <TableCell><PriorityBadge priority={ticket.priority} /></TableCell>
-                <TableCell><StatusBadge status={ticket.status} /></TableCell>
-                <TableCell className="text-right flex items-center justify-end gap-2 p-2">
-                  <Link href={`/dashboard/ticket/${ticket.id}`} onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="sm" className="h-8 text-[11px] font-bold text-muted-foreground hover:text-primary dark:hover:text-blue-400">
-                      <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
-                      View Details
-                    </Button>
-                  </Link>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild className="outline-none">
+      <Tabs defaultValue="assigned" className="w-full">
+        <TabsList className="bg-muted/50 p-1 border border-border rounded-xl">
+          <TabsTrigger value="assigned" className="rounded-lg px-5 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <ClipboardList className="mr-2 h-4 w-4" />
+            My Assigned Queue
+            {assignedTickets.length > 0 && (
+              <Badge variant="secondary" className="ml-2 bg-primary/10 text-primary border-none text-[10px] h-5 min-w-5 px-1 justify-center">
+                {assignedTickets.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="unassigned" className="rounded-lg px-5 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm text-muted-foreground data-[state=active]:text-foreground">
+            <InboxIcon className="mr-2 h-4 w-4" />
+            Available Board
+            {unassignedTickets.length > 0 && (
+              <Badge variant="secondary" className="ml-2 bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400 border-none text-[10px] h-5 min-w-5 px-1 justify-center">
+                {unassignedTickets.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="assigned" className="mt-6">
+          <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/40 hover:bg-muted/40 border-border">
+                  <TableHead className="w-[80px] font-bold text-[10px] uppercase tracking-wider text-muted-foreground">ID</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Title</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Requester</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Priority</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                  <TableHead className="text-right font-bold text-[10px] uppercase tracking-wider text-muted-foreground px-4">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-32 text-center">
+                      <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
+                    </TableCell>
+                  </TableRow>
+                ) : filteredAssigned.map((ticket) => (
+                  <TableRow
+                    key={ticket.id}
+                    className="hover:bg-primary/5 cursor-pointer transition-colors group border-border"
+                    onClick={() => router.push(`/dashboard/ticket/${ticket.id}`)}
+                  >
+                    <TableCell className="font-mono font-medium text-primary dark:text-blue-400 text-sm">
+                      #{ticket.id.slice(0, 4)}
+                    </TableCell>
+                    <TableCell className="font-medium text-foreground text-sm max-w-[120px] sm:max-w-[400px] truncate">
+                      {ticket.title}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      <div className="flex flex-col">
+                        <span className="text-foreground font-medium">{ticket.author.name}</span>
+                        <span className="text-[11px] underline decoration-muted/50">{ticket.author.email}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell><PriorityBadge priority={ticket.priority} /></TableCell>
+                    <TableCell><StatusBadge status={ticket.status} /></TableCell>
+                    <TableCell className="text-right flex items-center justify-end gap-2 p-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 text-[11px] font-bold shadow-sm rounded-lg"
+                            disabled={updatingId === ticket.id}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {updatingId === ticket.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Manage"}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-border">
+                          <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Update Status</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); handleUpdateStatus(ticket.id, "IN_PROGRESS"); }}
+                            className="cursor-pointer font-bold text-orange-600 dark:text-orange-400 focus:text-orange-700"
+                          >
+                            <PlayCircle className="mr-2 h-4 w-4" /> Start Working
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); handleUpdateStatus(ticket.id, "WAITING"); }}
+                            className="cursor-pointer font-medium"
+                          >
+                            <Clock className="mr-2 h-4 w-4" /> Need More Info
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); handleUpdateStatus(ticket.id, "RESOLVED"); }}
+                            className="cursor-pointer font-bold text-green-600 dark:text-green-400 focus:text-green-700"
+                          >
+                            <CheckCircle2 className="mr-2 h-4 w-4" /> Resolve Ticket
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            
+            {!isLoading && filteredAssigned.length === 0 && (
+              <div className="p-16 text-center">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-secondary/50 mb-4">
+                  <CheckCircle2 className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground font-display">No tasks assigned</h3>
+                <p className="text-muted-foreground mt-1 max-w-sm mx-auto">Either you're all caught up or you should check the available board for new tickets.</p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="unassigned" className="mt-6">
+          <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/40 hover:bg-muted/40 border-border">
+                  <TableHead className="w-[80px] font-bold text-[10px] uppercase tracking-wider text-muted-foreground">ID</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Title</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Requester</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Priority</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-center">Wait Time</TableHead>
+                  <TableHead className="text-right font-bold text-[10px] uppercase tracking-wider text-muted-foreground px-4">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isUnassignedLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-32 text-center">
+                      <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
+                    </TableCell>
+                  </TableRow>
+                ) : filteredUnassigned.map((ticket) => (
+                  <TableRow
+                    key={ticket.id}
+                    className="hover:bg-orange-50/30 dark:hover:bg-orange-900/5 cursor-pointer transition-colors group border-border"
+                    onClick={() => router.push(`/dashboard/ticket/${ticket.id}`)}
+                  >
+                    <TableCell className="font-mono font-medium text-orange-600 dark:text-orange-400 text-sm">
+                      #{ticket.id.slice(0, 4)}
+                    </TableCell>
+                    <TableCell className="font-medium text-foreground text-sm max-w-[120px] sm:max-w-[400px] truncate">
+                      {ticket.title}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      <div className="flex flex-col">
+                        <span className="text-foreground font-medium">{ticket.author.name}</span>
+                        <span className="text-[11px]">{ticket.author.email}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell><PriorityBadge priority={ticket.priority} /></TableCell>
+                    <TableCell className="text-center">
+                       <div className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+                         <Clock className="h-3 w-3" />
+                         {new Date(ticket.createdAt).toLocaleDateString()}
+                       </div>
+                    </TableCell>
+                    <TableCell className="text-right p-2">
                       <Button
                         size="sm"
-                        className="h-8 text-[11px] font-bold shadow-sm"
+                        className="h-8 bg-black hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-black dark:hover:bg-zinc-200 text-[11px] font-bold shadow-sm rounded-lg"
                         disabled={updatingId === ticket.id}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClaimTicket(ticket.id);
+                        }}
                       >
-                        {updatingId === ticket.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Update"}
+                        {updatingId === ticket.id ? <Loader2 className="h-3 w-3 animate-spin" /> : (
+                          <>
+                            <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+                            Claim Ticket
+                          </>
+                        )}
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl">
-                      <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Change Status</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleUpdateStatus(ticket.id, "IN_PROGRESS");
-                        }}
-                        className="cursor-pointer font-bold text-orange-600 dark:text-orange-400 focus:text-orange-700 focus:bg-orange-50 dark:focus:bg-orange-950/30"
-                      >
-                        <PlayCircle className="mr-2 h-4 w-4" /> Start Work
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleUpdateStatus(ticket.id, "WAITING");
-                        }}
-                        className="cursor-pointer font-medium"
-                      >
-                        <Clock className="mr-2 h-4 w-4" /> Wait for User
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleUpdateStatus(ticket.id, "RESOLVED");
-                        }}
-                        className="cursor-pointer font-bold text-green-600 dark:text-green-400 focus:text-green-700 focus:bg-green-50 dark:focus:bg-green-950/30"
-                      >
-                        <CheckCircle2 className="mr-2 h-4 w-4" /> Mark Resolved
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        
-        {!isLoading && filteredTickets.length === 0 && (
-           <div className="p-12 text-center">
-             <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-100/50 dark:bg-green-900/30 mb-4 border border-green-200 dark:border-green-800">
-               <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
-             </div>
-             <h3 className="text-lg font-bold text-foreground">You're all caught up!</h3>
-             <p className="text-muted-foreground mt-1">There are no tickets assigned to you right now.</p>
-           </div>
-        )}
-      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            
+            {!isUnassignedLoading && filteredUnassigned.length === 0 && (
+              <div className="p-16 text-center">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20 mb-4 border border-green-200 dark:border-green-800">
+                  <InboxIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground font-display">No Available Tickets</h3>
+                <p className="text-muted-foreground mt-1 max-w-sm mx-auto">Great job! All customer requests are currently assigned to technicians.</p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

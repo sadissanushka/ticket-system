@@ -12,7 +12,11 @@ export const ENDPOINTS = {
     REGISTER: `${API_URL}/api/auth/register`,
     ME: `${API_URL}/api/auth/me`,
   },
-  TICKETS: `${API_URL}/api/tickets`,
+  TICKETS: {
+    BASE: `${API_URL}/api/tickets`,
+    ASSIGNED: (userId: string) => `${API_URL}/api/tickets/assigned/${userId}`,
+    UNASSIGNED: `${API_URL}/api/tickets/unassigned`,
+  },
   USERS: `${API_URL}/api/users`,
   CATEGORIES: `${API_URL}/api/categories`,
   MESSAGES: `${API_URL}/api/messages`,

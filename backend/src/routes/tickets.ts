@@ -26,6 +26,26 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   }
 });
 
+// Get All Unassigned Tickets
+router.get('/unassigned', authenticate, authorize(['ADMIN', 'TECHNICIAN']), async (req: AuthRequest, res: Response) => {
+  try {
+    const tickets = await prisma.ticket.findMany({
+      where: { 
+        assignedToId: null,
+        status: 'OPEN'
+      },
+      include: {
+        category: true,
+        author: { select: { id: true, name: true, email: true } },
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(tickets);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch unassigned tickets' });
+  }
+});
+
 // Get All Tickets (Admin/Technician overview)
 router.get('/all', authenticate, authorize(['ADMIN', 'TECHNICIAN']), async (req: AuthRequest, res: Response) => {
   try {
@@ -64,12 +84,13 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Ticket not found' });
     }
 
-    // Authorization: Admin, Author, or Assigned Tech
+    // Authorization: Admin, Technician, Author, or Assigned User
     const isAdmin = req.user!.role === 'ADMIN';
+    const isTechnician = req.user!.role === 'TECHNICIAN';
     const isAuthor = ticket.authorId === req.user!.id;
     const isAssigned = ticket.assignedToId === req.user!.id;
 
-    if (!isAdmin && !isAuthor && !isAssigned) {
+    if (!isAdmin && !isTechnician && !isAuthor && !isAssigned) {
       return res.status(403).json({ error: 'Access denied to this ticket' });
     }
 
